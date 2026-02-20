@@ -166,6 +166,9 @@ async function start() {
   }
 }
 
-start();
+// Only start the server when run directly (not during tests)
+if (process.env["NODE_ENV"] !== "test") {
+  start();
+}
 
 export { build };
