@@ -225,6 +225,12 @@ jobs:
       - name: Run migrations
         run: pnpm --filter @knesset-vote/db migrate:deploy
 
+      - name: Build shared package
+        run: pnpm --filter @knesset-vote/shared build
+
+      - name: Build db package
+        run: pnpm --filter @knesset-vote/db build
+
       - name: Seed demo data
         run: pnpm db:seed
 
@@ -244,6 +250,7 @@ jobs:
         run: pnpm --filter @knesset-vote/web test:e2e
         env:
           WEB_URL: http://localhost:3000
+          NEXT_PUBLIC_API_URL: http://localhost:3001
 
       - name: Upload Playwright report
         if: failure()

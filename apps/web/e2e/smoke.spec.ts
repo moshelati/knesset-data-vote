@@ -12,8 +12,8 @@ test.describe("Home page", () => {
     await page.goto(BASE_URL);
     await expect(page).toHaveTitle(/Knesset Vote/i);
 
-    // Search input visible
-    const searchInput = page.getByLabel("חיפוש");
+    // Search input visible (use the text input, not the nav link)
+    const searchInput = page.getByRole("textbox", { name: "חיפוש" });
     await expect(searchInput).toBeVisible();
 
     // Navigation present
@@ -25,7 +25,8 @@ test.describe("Home page", () => {
 
   test("shows data source information", async ({ page }) => {
     await page.goto(BASE_URL);
-    await expect(page.getByText(/Knesset OData/i)).toBeVisible();
+    // Use the footer link which is always present and unique enough
+    await expect(page.getByText(/Knesset OData/i).first()).toBeVisible();
   });
 
   test("has skip link for accessibility", async ({ page }) => {
