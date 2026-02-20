@@ -27,7 +27,7 @@ export async function listBills(opts: {
   const { search, topic, status, mk_id, page, limit } = opts;
   const skip = (page - 1) * limit;
 
-  const where: Parameters<typeof db.bill.findMany>[0]["where"] = {};
+  const where: NonNullable<Parameters<typeof db.bill.findMany>[0]>["where"] = {};
 
   if (search) {
     where.OR = [
@@ -125,7 +125,6 @@ export async function getBillById(id: string): Promise<BillDetail | null> {
     submitted_date: bill.submitted_date?.toISOString() ?? null,
     last_status_date: bill.last_status_date?.toISOString() ?? null,
     source_url: bill.source_url,
-    is_demo: bill.is_demo,
     sponsors: bill.sponsors.map((s, i) => ({
       mk_id: s.mk.id,
       mk_name_he: s.mk.name_he,

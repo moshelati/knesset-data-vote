@@ -7,7 +7,6 @@ import {
   MK_ENTITY_SET_CANDIDATES,
   MK_FACTION_ENTITY_SET_CANDIDATES,
   mapMemberToMK,
-  mapMemberFactionToMembership,
   type RawMember,
   type RawMemberFaction,
 } from "../mappers/mk-mapper.js";

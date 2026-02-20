@@ -12,7 +12,7 @@ export async function listVotes(opts: {
   const { mk_id, bill_id, knesset_number, result, page, limit } = opts;
   const skip = (page - 1) * limit;
 
-  const where: Parameters<typeof db.vote.findMany>[0]["where"] = {};
+  const where: NonNullable<Parameters<typeof db.vote.findMany>[0]>["where"] = {};
 
   if (bill_id) {
     where.OR = [{ bill_id }, { bill: { external_id: bill_id } }];

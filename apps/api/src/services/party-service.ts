@@ -120,7 +120,6 @@ export async function getPartyById(id: string): Promise<PartyDetail | null> {
     seat_count: party.seat_count,
     is_active: party.is_active,
     source_url: party.source_url,
-    is_demo: party.is_demo,
     last_seen_at: party.last_seen_at?.toISOString() ?? null,
     last_changed_at: party.last_changed_at?.toISOString() ?? null,
     mk_count: party.memberships.length,

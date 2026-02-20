@@ -28,7 +28,7 @@ export async function listMKs(opts: {
   const { search, party_id, is_current, page, limit } = opts;
   const skip = (page - 1) * limit;
 
-  const where: Parameters<typeof db.mK.findMany>[0]["where"] = {};
+  const where: NonNullable<Parameters<typeof db.mK.findMany>[0]>["where"] = {};
 
   if (search) {
     where.OR = [
@@ -94,7 +94,6 @@ export async function listMKs(opts: {
         current_party_name: currentMembership?.party.name_he ?? null,
         source_url: mk.source_url,
         image_url: mk.image_url,
-        is_demo: mk.is_demo,
         last_seen_at: mk.last_seen_at?.toISOString() ?? null,
         last_changed_at: mk.last_changed_at?.toISOString() ?? null,
         sources: mk.sources,
@@ -225,7 +224,6 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
     current_party_name: currentMembership?.party.name_he ?? null,
     source_url: mk.source_url,
     image_url: mk.image_url,
-    is_demo: mk.is_demo,
     last_seen_at: mk.last_seen_at?.toISOString() ?? null,
     last_changed_at: mk.last_changed_at?.toISOString() ?? null,
     memberships: mk.memberships.map((m, i) => ({
@@ -275,7 +273,7 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
     })),
     profile: {
       gender: genderKey,
-      gender_label_he: genderLabelMap[genderKey],
+      gender_label_he: genderLabelMap[genderKey] ?? "",
       knesset_terms: knessetTerms,
       first_elected: firstElected?.toISOString() ?? null,
     },

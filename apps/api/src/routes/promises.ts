@@ -51,7 +51,7 @@ export async function promiseRoutes(app: FastifyInstance): Promise<void> {
         limit?: number;
       };
 
-      const where: Parameters<typeof db.promise.findMany>[0]["where"] = {};
+      const where: NonNullable<Parameters<typeof db.promise.findMany>[0]>["where"] = {};
       if (topic) where.topic = topic;
       if (person) where.mk_id = person;
       if (party) where.party_id = party;
