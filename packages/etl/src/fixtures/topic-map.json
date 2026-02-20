@@ -1,0 +1,52 @@
+[
+  {
+    "id": "housing_prices",
+    "label_he": "הורדת מחירי הדיור",
+    "topic_keys": ["housing"]
+  },
+  {
+    "id": "personal_national_security",
+    "label_he": "ביטחון אישי/לאומי",
+    "topic_keys": ["security_defense"]
+  },
+  {
+    "id": "haredi_integration",
+    "label_he": "שילוב חרדים בצה\"ל / שירות לאומי",
+    "topic_keys": ["security_defense", "religion_state"]
+  },
+  {
+    "id": "transport_reform",
+    "label_he": "רפורמות תחבורה ציבורית",
+    "topic_keys": ["infrastructure"]
+  },
+  {
+    "id": "cost_of_living",
+    "label_he": "הורדת חסמי יבוא / יוקר המחיה",
+    "topic_keys": ["economy"]
+  },
+  {
+    "id": "healthcare",
+    "label_he": "בריאות",
+    "topic_keys": ["healthcare"]
+  },
+  {
+    "id": "education",
+    "label_he": "חינוך",
+    "topic_keys": ["education"]
+  },
+  {
+    "id": "religion_state",
+    "label_he": "דת ומדינה",
+    "topic_keys": ["religion_state"]
+  },
+  {
+    "id": "rule_of_law",
+    "label_he": "שלטון חוק / רפורמות משפטיות",
+    "topic_keys": ["justice_law"]
+  },
+  {
+    "id": "economy_innovation",
+    "label_he": "כלכלה/חדשנות",
+    "topic_keys": ["economy"]
+  }
+]

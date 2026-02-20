@@ -1,0 +1,460 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// PARTIES (Factions)
+// ─────────────────────────────────────────────
+model Party {
+  id              String   @id @default(cuid())
+  external_id     String
+  external_source String   @default("knesset_odata")
+  source_url      String?
+
+  name_he       String
+  name_en       String?
+  abbreviation  String?
+  knesset_number Int?
+  seat_count    Int?
+  is_active     Boolean  @default(true)
+  is_demo       Boolean  @default(false)
+
+  last_seen_at    DateTime?
+  last_changed_at DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  memberships PartyMembership[]
+  promises    Promise[]
+
+  @@unique([external_id, external_source])
+  @@index([name_he])
+  @@index([is_active])
+  @@index([knesset_number])
+}
+
+// ─────────────────────────────────────────────
+// MKS (Members of Knesset)
+// ─────────────────────────────────────────────
+model MK {
+  id              String  @id @default(cuid())
+  external_id     String
+  external_source String  @default("knesset_odata")
+  source_url      String?
+
+  name_he         String
+  name_en         String?
+  name_first_he   String?
+  name_last_he    String?
+  gender          String  @default("unknown")
+  is_current      Boolean @default(false)
+  is_demo         Boolean @default(false)
+  image_url       String?
+
+  last_seen_at    DateTime?
+  last_changed_at DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  memberships           PartyMembership[]
+  bill_roles            MKBillRole[]
+  committee_memberships CommitteeMembership[]
+  vote_records          VoteRecord[]
+  promises              Promise[]
+
+  @@unique([external_id, external_source])
+  @@index([name_he])
+  @@index([name_last_he])
+  @@index([is_current])
+}
+
+// ─────────────────────────────────────────────
+// PARTY MEMBERSHIPS
+// ─────────────────────────────────────────────
+model PartyMembership {
+  id              String  @id @default(cuid())
+  mk_id           String
+  party_id        String
+  external_id     String?
+  external_source String  @default("knesset_odata")
+
+  knesset_number Int?
+  start_date     DateTime?
+  end_date       DateTime?
+  is_current     Boolean   @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  mk    MK    @relation(fields: [mk_id], references: [id], onDelete: Cascade)
+  party Party @relation(fields: [party_id], references: [id], onDelete: Cascade)
+
+  @@unique([mk_id, party_id, knesset_number])
+  @@index([mk_id])
+  @@index([party_id])
+  @@index([is_current])
+}
+
+// ─────────────────────────────────────────────
+// BILLS (Proposed Legislation)
+// ─────────────────────────────────────────────
+model Bill {
+  id              String @id @default(cuid())
+  external_id     String
+  external_source String @default("knesset_odata")
+  source_url      String?
+
+  title_he         String
+  title_en         String?
+  description_he   String? @db.Text
+  description_en   String? @db.Text
+  status           String  @default("unknown")
+  topic            String?
+  knesset_number   Int?
+  submitted_date   DateTime?
+  last_status_date DateTime?
+  is_demo          Boolean @default(false)
+
+  last_seen_at    DateTime?
+  last_changed_at DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  sponsors        MKBillRole[]
+  stage_history   BillStage[]
+  votes           Vote[]
+  promise_matches PromiseMatch[]
+  ai_summary      BillAISummary?
+
+  @@unique([external_id, external_source])
+  @@index([title_he])
+  @@index([status])
+  @@index([topic])
+  @@index([knesset_number])
+  @@index([submitted_date])
+}
+
+// ─────────────────────────────────────────────
+// BILL STAGES (Status History)
+// ─────────────────────────────────────────────
+model BillStage {
+  id              String @id @default(cuid())
+  bill_id         String
+  external_id     String?
+  external_source String @default("knesset_odata")
+
+  stage_name_he String
+  stage_name_en String?
+  status        String?
+  stage_date    DateTime?
+  committee_id  String?
+  notes         String? @db.Text
+
+  created_at DateTime @default(now())
+
+  bill      Bill       @relation(fields: [bill_id], references: [id], onDelete: Cascade)
+  committee Committee? @relation(fields: [committee_id], references: [id])
+
+  @@unique([bill_id, external_id])
+  @@index([bill_id])
+  @@index([stage_date])
+}
+
+// ─────────────────────────────────────────────
+// MK-BILL ROLES (Sponsors, Co-sponsors, etc.)
+// ─────────────────────────────────────────────
+model MKBillRole {
+  id              String @id @default(cuid())
+  mk_id           String
+  bill_id         String
+  party_id        String?
+  external_id     String?
+  external_source String @default("knesset_odata")
+
+  role String @default("initiator") // initiator, cosponsor, committee, other
+
+  created_at DateTime @default(now())
+
+  mk    MK    @relation(fields: [mk_id], references: [id], onDelete: Cascade)
+  bill  Bill  @relation(fields: [bill_id], references: [id], onDelete: Cascade)
+
+  @@unique([mk_id, bill_id, role])
+  @@index([mk_id])
+  @@index([bill_id])
+  @@index([party_id])
+}
+
+// ─────────────────────────────────────────────
+// COMMITTEES
+// ─────────────────────────────────────────────
+model Committee {
+  id              String @id @default(cuid())
+  external_id     String
+  external_source String @default("knesset_odata")
+  source_url      String?
+
+  name_he        String
+  name_en        String?
+  knesset_number Int?
+  is_active      Boolean @default(true)
+
+  last_seen_at DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  memberships CommitteeMembership[]
+  bill_stages BillStage[]
+
+  @@unique([external_id, external_source])
+  @@index([name_he])
+  @@index([is_active])
+}
+
+// ─────────────────────────────────────────────
+// COMMITTEE MEMBERSHIPS
+// ─────────────────────────────────────────────
+model CommitteeMembership {
+  id              String @id @default(cuid())
+  mk_id           String
+  committee_id    String
+  external_id     String?
+  external_source String @default("knesset_odata")
+
+  role       String?
+  start_date DateTime?
+  end_date   DateTime?
+  is_current Boolean   @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  mk        MK        @relation(fields: [mk_id], references: [id], onDelete: Cascade)
+  committee Committee @relation(fields: [committee_id], references: [id], onDelete: Cascade)
+
+  @@unique([mk_id, committee_id])
+  @@index([mk_id])
+  @@index([committee_id])
+}
+
+// ─────────────────────────────────────────────
+// VOTES
+// ─────────────────────────────────────────────
+model Vote {
+  id              String @id @default(cuid())
+  external_id     String
+  external_source String @default("knesset_odata")
+  source_url      String?
+
+  title_he       String
+  title_en       String?
+  vote_date      DateTime?
+  knesset_number Int?
+  bill_id        String?
+  topic          String?
+  yes_count      Int?
+  no_count       Int?
+  abstain_count  Int?
+  result         String?
+
+  last_seen_at DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  bill    Bill?        @relation(fields: [bill_id], references: [id])
+  records VoteRecord[]
+
+  @@unique([external_id, external_source])
+  @@index([vote_date])
+  @@index([bill_id])
+  @@index([topic])
+}
+
+// ─────────────────────────────────────────────
+// VOTE RECORDS (Individual MK votes)
+// ─────────────────────────────────────────────
+model VoteRecord {
+  id              String @id @default(cuid())
+  vote_id         String
+  mk_id           String
+  external_id     String?
+  external_source String @default("knesset_odata")
+
+  position String // yes, no, abstain, absent, did_not_vote
+
+  created_at DateTime @default(now())
+
+  vote Vote @relation(fields: [vote_id], references: [id], onDelete: Cascade)
+  mk   MK   @relation(fields: [mk_id], references: [id], onDelete: Cascade)
+
+  @@unique([vote_id, mk_id])
+  @@index([vote_id])
+  @@index([mk_id])
+}
+
+// ─────────────────────────────────────────────
+// PROMISES (Statements/Commitments - Manual in v1)
+// ─────────────────────────────────────────────
+model Promise {
+  id       String @id @default(cuid())
+  text     String @db.Text
+  // UI label: "Statement" or "Commitment" - never "Promise" for legal reasons
+  category String @default("statement") // statement, commitment, pledge
+  topic    String?
+
+  mk_id    String?
+  party_id String?
+
+  stated_on    DateTime?
+  source_url   String
+  source_label String
+  added_by     String    @default("manual") // manual, import
+  is_demo      Boolean   @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  mk      MK?    @relation(fields: [mk_id], references: [id])
+  party   Party? @relation(fields: [party_id], references: [id])
+  matches PromiseMatch[]
+
+  @@index([mk_id])
+  @@index([party_id])
+  @@index([topic])
+}
+
+// ─────────────────────────────────────────────
+// PROMISE MATCHES
+// ─────────────────────────────────────────────
+model PromiseMatch {
+  id         String  @id @default(cuid())
+  promise_id String
+  bill_id    String?
+  vote_id    String?
+
+  match_type  String // manual, auto_keyword, auto_semantic
+  confidence  String // high, medium, low, unavailable
+  // Status uses neutral language per principle 3
+  status      String @default("no_match") // matched, partial_match, no_match, unavailable
+  status_date DateTime?
+  notes       String? @db.Text
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  promise Promise @relation(fields: [promise_id], references: [id], onDelete: Cascade)
+  bill    Bill?   @relation(fields: [bill_id], references: [id])
+
+  @@index([promise_id])
+  @@index([bill_id])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+// SOURCE LINKS (Provenance - simple flat table)
+// Using entity_type + entity_id as a soft polymorphic reference
+// (avoids Prisma hard FK constraint limitations with true polymorphism)
+// ─────────────────────────────────────────────
+model SourceLink {
+  id              String @id @default(cuid())
+  entity_type     String // "party" | "mk" | "bill" | "committee" | "vote" | "mk_membership" | "bill_stage"
+  entity_id       String // The cuid() id of the related record
+  label           String
+  url             String
+  external_source String
+  external_id     String?
+
+  created_at DateTime @default(now())
+
+  @@index([entity_type, entity_id])
+  @@index([external_source, external_id])
+}
+
+// ─────────────────────────────────────────────
+// RAW SNAPSHOTS (Audit trail)
+// ─────────────────────────────────────────────
+model RawSnapshot {
+  id              String @id @default(cuid())
+  entity_type     String
+  entity_id       String // soft reference to related record
+  external_source String
+  external_id     String
+  etl_run_id      String
+
+  payload_json  Json?
+  payload_hash  String
+  payload_size  Int
+  fetched_at    DateTime @default(now())
+
+  etl_run ETLRun @relation(fields: [etl_run_id], references: [id])
+
+  @@index([entity_type, entity_id])
+  @@index([etl_run_id])
+  @@index([external_source, external_id])
+  @@index([fetched_at])
+}
+
+// ─────────────────────────────────────────────
+// ETL RUNS
+// ─────────────────────────────────────────────
+model ETLRun {
+  id           String    @id @default(cuid())
+  started_at   DateTime  @default(now())
+  completed_at DateTime?
+  status       String    @default("running") // running, completed, failed, partial
+
+  source         String
+  source_version String?
+  commit_hash    String?
+
+  counts_json Json? // { entityType: { fetched, created, updated, failed } }
+  errors_json Json? // string[]
+  latency_ms  Int?
+
+  entity_sets_discovered Json? // discovered OData entity set names
+
+  snapshots RawSnapshot[]
+
+  @@index([started_at])
+  @@index([status])
+  @@index([source])
+}
+
+// ─────────────────────────────────────────────
+// AI BILL SUMMARIES
+// ─────────────────────────────────────────────
+model BillAISummary {
+  id      String @id @default(cuid())
+  bill_id String @unique
+
+  summary_text  String @db.Text
+  model_name    String
+  model_version String?
+  generated_at  DateTime @default(now())
+  source_fields Json     // which bill fields were used
+  warning       String   @default("AI-generated summary; verify with official sources below.")
+
+  bill Bill @relation(fields: [bill_id], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// PARTY TOPIC AGGREGATION (Materialized cache for My Election feature)
+// Soft reference to Party via party_id (no FK constraint — same pattern as SourceLink).
+// Written by `pnpm etl:aggregate`, read by POST /api/recommendations.
+// ─────────────────────────────────────────────
+model PartyTopicAgg {
+  id          String   @id @default(cuid())
+  party_id    String
+  topic       String   // matches BillTopic keys from TOPIC_KEYWORDS
+  raw_score   Float
+  bill_count  Int
+  computed_at DateTime @default(now())
+
+  @@unique([party_id, topic])
+  @@index([party_id])
+  @@index([topic])
+}
