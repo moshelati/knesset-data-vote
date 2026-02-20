@@ -168,7 +168,7 @@ async function main() {
       (SELECT COUNT(*) FROM "Committee") as committees,
       (SELECT COUNT(*) FROM "CommitteeMembership") as memberships
   `;
-  const { committees, memberships } = counts[0];
+  const { committees, memberships } = counts[0]!;
   console.log(
     `\n✅ Done! DB now has ${committees} committees and ${memberships} committee memberships`,
   );

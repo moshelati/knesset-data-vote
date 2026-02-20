@@ -48,8 +48,8 @@ export async function syncParties(
             const existing = await db.party.findUnique({
               where: {
                 external_id_external_source: {
-                  external_id: data.external_id,
-                  external_source: data.external_source,
+                  external_id: data.external_id!,
+                  external_source: data.external_source!,
                 },
               },
             });
@@ -57,8 +57,8 @@ export async function syncParties(
             const party = await db.party.upsert({
               where: {
                 external_id_external_source: {
-                  external_id: data.external_id,
-                  external_source: data.external_source,
+                  external_id: data.external_id!,
+                  external_source: data.external_source!,
                 },
               },
               create: data,

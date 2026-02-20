@@ -2,7 +2,7 @@
  * Unit tests for OData metadata parser and client pagination logic
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { parseODataMetadataXmlAsync, findEntitySet } from "../client/odata-metadata.js";
 import { assertAllowedUrl } from "../client/ssrf-guard.js";
 

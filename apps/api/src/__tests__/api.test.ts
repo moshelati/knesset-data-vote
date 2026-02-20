@@ -5,6 +5,9 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import type { FastifyInstance } from "fastify";
 
+// Ensure server.ts does not call start() during tests
+process.env["NODE_ENV"] = "test";
+
 // Mock database calls
 vi.mock("@knesset-vote/db", () => ({
   db: {

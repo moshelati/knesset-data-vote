@@ -50,8 +50,8 @@ export async function syncBills(
             const existing = await db.bill.findUnique({
               where: {
                 external_id_external_source: {
-                  external_id: data.external_id,
-                  external_source: data.external_source,
+                  external_id: data.external_id!,
+                  external_source: data.external_source!,
                 },
               },
             });
@@ -59,8 +59,8 @@ export async function syncBills(
             const bill = await db.bill.upsert({
               where: {
                 external_id_external_source: {
-                  external_id: data.external_id,
-                  external_source: data.external_source,
+                  external_id: data.external_id!,
+                  external_source: data.external_source!,
                 },
               },
               create: data,

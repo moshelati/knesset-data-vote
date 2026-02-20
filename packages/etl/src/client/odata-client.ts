@@ -9,7 +9,7 @@
  * - SSRF guard
  */
 
-import pRetry from "p-retry";
+import pRetry, { AbortError } from "p-retry";
 import type { ODataMetadata, ODataResponse } from "@knesset-vote/shared";
 import { ETL_PAGE_SIZE, ETL_REQUEST_DELAY_MS, ETL_RETRY_MAX } from "@knesset-vote/shared";
 import { safeFetch } from "./ssrf-guard.js";
@@ -67,7 +67,7 @@ export class ODataClient {
           }
 
           if (!res.ok) {
-            throw new pRetry.AbortError(
+            throw new AbortError(
               `Non-retryable HTTP ${res.status}: ${res.statusText} for ${currentUrl}`,
             );
           }

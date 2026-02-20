@@ -45,8 +45,8 @@ export async function syncCommittees(
             const committee = await db.committee.upsert({
               where: {
                 external_id_external_source: {
-                  external_id: data.external_id,
-                  external_source: data.external_source,
+                  external_id: data.external_id!,
+                  external_source: data.external_source!,
                 },
               },
               create: data,
