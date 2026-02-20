@@ -102,10 +102,11 @@ test.describe("Methodology page", () => {
     await page.goto(`${BASE_URL}/methodology`);
     await expect(page).toHaveTitle(/מתודולוגיה/i);
 
-    // Key sections present — use heading role to avoid TOC link duplicates
-    await expect(page.getByRole("heading", { name: "עקרונות יסוד" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "מקורות נתונים" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "מגבלות ידועות" })).toBeVisible();
+    // Key sections present — scope to <main> to exclude footer headings with same text
+    const main = page.getByRole("main");
+    await expect(main.getByRole("heading", { name: "עקרונות יסוד" })).toBeVisible();
+    await expect(main.getByRole("heading", { name: "מקורות נתונים" })).toBeVisible();
+    await expect(main.getByRole("heading", { name: "מגבלות ידועות" })).toBeVisible();
   });
 
   test("shows neutral language principles", async ({ page }) => {
