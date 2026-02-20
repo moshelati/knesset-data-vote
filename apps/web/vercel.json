@@ -1,6 +1,7 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd ../.. && pnpm --filter @knesset-vote/shared build && pnpm --filter @knesset-vote/db build && pnpm --filter @knesset-vote/web build",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "outputDirectory": ".next"
+  "buildCommand": "bash scripts/vercel-build.sh",
+  "outputDirectory": ".next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web packages/shared packages/db"
 }
