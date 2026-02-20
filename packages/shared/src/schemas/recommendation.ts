@@ -24,15 +24,11 @@ export const RecommendationRequestSchema = z.object({
    * stored in the response meta for transparency, but it is NEVER used in
    * scoring. Parties are ranked solely by legislative activity.
    */
-  ideological_preference: z
-    .enum(["right", "center", "left", "none"])
-    .optional(),
+  ideological_preference: z.enum(["right", "center", "left", "none"]).optional(),
 });
 
 export type RecommendationRequest = z.infer<typeof RecommendationRequestSchema>;
-export type RecommendationTopicWeight = z.infer<
-  typeof RecommendationTopicWeightSchema
->;
+export type RecommendationTopicWeight = z.infer<typeof RecommendationTopicWeightSchema>;
 
 // ──────────────────────────────────────────
 // Response schema
@@ -99,6 +95,4 @@ export type HighlightBill = z.infer<typeof HighlightBillSchema>;
 export type RecommendationResult = z.infer<typeof RecommendationResultSchema>;
 export type FreeTextSuggestion = z.infer<typeof FreeTextSuggestionSchema>;
 export type RecommendationMeta = z.infer<typeof RecommendationMetaSchema>;
-export type RecommendationResponse = z.infer<
-  typeof RecommendationResponseSchema
->;
+export type RecommendationResponse = z.infer<typeof RecommendationResponseSchema>;

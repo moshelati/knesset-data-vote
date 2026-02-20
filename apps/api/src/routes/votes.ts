@@ -24,7 +24,14 @@ export async function voteRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async (request, reply) => {
-      const { mk_id, bill_id, knesset_number, result, page = 1, limit = 20 } = request.query as {
+      const {
+        mk_id,
+        bill_id,
+        knesset_number,
+        result,
+        page = 1,
+        limit = 20,
+      } = request.query as {
         mk_id?: string;
         bill_id?: string;
         knesset_number?: number;
@@ -33,7 +40,14 @@ export async function voteRoutes(app: FastifyInstance): Promise<void> {
         limit?: number;
       };
 
-      const cacheKey = buildCacheKey("votes", { mk_id, bill_id, knesset_number, result, page, limit });
+      const cacheKey = buildCacheKey("votes", {
+        mk_id,
+        bill_id,
+        knesset_number,
+        result,
+        page,
+        limit,
+      });
       const data = await getCached(cacheKey, CACHE_TTL.SHORT, () =>
         listVotes({ mk_id, bill_id, knesset_number, result, page, limit }),
       );
@@ -66,7 +80,9 @@ export async function voteRoutes(app: FastifyInstance): Promise<void> {
       const result = await getCached(cacheKey, CACHE_TTL.MEDIUM, () => getVoteById(id));
 
       if (!result) {
-        return reply.code(404).send({ error: "Not Found", message: "Vote not found", statusCode: 404 });
+        return reply
+          .code(404)
+          .send({ error: "Not Found", message: "Vote not found", statusCode: 404 });
       }
 
       reply.send({ data: result });

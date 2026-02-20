@@ -144,10 +144,7 @@ export async function syncMKs(
   // Now sync detailed faction memberships if available
   await syncMKMemberships(metadata, tracker, mkIdMap, partyIdMap, client);
 
-  logger.info(
-    { count: mkIdMap.size, ...tracker.getSummary().counts["mk"] },
-    "MK sync complete",
-  );
+  logger.info({ count: mkIdMap.size, ...tracker.getSummary().counts["mk"] }, "MK sync complete");
   return mkIdMap;
 }
 
@@ -205,12 +202,26 @@ async function syncMKMemberships(
                 external_source: "knesset_odata",
                 knesset_number: knessetNum,
                 start_date: raw.StartDate ? new Date(raw.StartDate) : null,
-                end_date: raw.EndDate ? new Date(raw.EndDate) : raw.FinishDate ? new Date(raw.FinishDate) : null,
-                is_current: raw.IsCurrent !== undefined ? Boolean(raw.IsCurrent) : !(raw.EndDate ?? raw.FinishDate),
+                end_date: raw.EndDate
+                  ? new Date(raw.EndDate)
+                  : raw.FinishDate
+                    ? new Date(raw.FinishDate)
+                    : null,
+                is_current:
+                  raw.IsCurrent !== undefined
+                    ? Boolean(raw.IsCurrent)
+                    : !(raw.EndDate ?? raw.FinishDate),
               },
               update: {
-                end_date: raw.EndDate ? new Date(raw.EndDate) : raw.FinishDate ? new Date(raw.FinishDate) : null,
-                is_current: raw.IsCurrent !== undefined ? Boolean(raw.IsCurrent) : !(raw.EndDate ?? raw.FinishDate),
+                end_date: raw.EndDate
+                  ? new Date(raw.EndDate)
+                  : raw.FinishDate
+                    ? new Date(raw.FinishDate)
+                    : null,
+                is_current:
+                  raw.IsCurrent !== undefined
+                    ? Boolean(raw.IsCurrent)
+                    : !(raw.EndDate ?? raw.FinishDate),
               },
             });
 

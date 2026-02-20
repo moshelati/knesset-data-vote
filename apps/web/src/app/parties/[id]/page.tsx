@@ -13,7 +13,7 @@ interface PartyDetailResponse {
   data: PartyDetail & { is_demo?: boolean };
 }
 
-async function getParty(id: string): Promise<PartyDetail & { is_demo?: boolean } | null> {
+async function getParty(id: string): Promise<(PartyDetail & { is_demo?: boolean }) | null> {
   try {
     const res = await apiFetch<PartyDetailResponse>(`/api/parties/${id}`);
     return res.data;
@@ -52,26 +52,22 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-neutral-900">{party.name_he}</h1>
-            {party.name_en && (
-              <p className="mt-1 text-lg text-neutral-500">{party.name_en}</p>
-            )}
+            {party.name_en && <p className="mt-1 text-lg text-neutral-500">{party.name_en}</p>}
           </div>
           {party.is_active ? (
-            <span className="badge bg-green-100 text-green-800 px-3 py-1 text-sm">פעילה</span>
+            <span className="badge bg-green-100 px-3 py-1 text-sm text-green-800">פעילה</span>
           ) : (
             <span className="badge badge-unknown px-3 py-1 text-sm">לא פעילה</span>
           )}
         </div>
 
         {party.knesset_number && (
-          <p className="mt-2 text-sm text-neutral-600">
-            כנסת ה-{party.knesset_number}
-          </p>
+          <p className="mt-2 text-sm text-neutral-600">כנסת ה-{party.knesset_number}</p>
         )}
 
         {/* Sources */}
         <div className="mt-4">
-          <span className="text-xs font-medium text-neutral-500 mr-2">מקורות:</span>
+          <span className="mr-2 text-xs font-medium text-neutral-500">מקורות:</span>
           <SourceBadge sources={party.sources} />
         </div>
         <div className="mt-4">
@@ -113,9 +109,7 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
             label="חברויות בוועדות (נוכחי)"
             value={party.activity_summary.committee_meetings}
             tooltip="מספר חברויות פעילות בוועדות כנסת — לפי Knesset OData"
-            confidence={
-              party.activity_summary.committee_meetings !== null ? "high" : "unavailable"
-            }
+            confidence={party.activity_summary.committee_meetings !== null ? "high" : "unavailable"}
           />
         </div>
         <p className="mt-3 text-xs text-neutral-400">
@@ -134,7 +128,7 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
         </h2>
         <Link
           href={`/mks?party_id=${party.id}`}
-          className="inline-flex items-center gap-2 rounded-lg border border-brand-300 bg-brand-50 px-4 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100"
+          className="border-brand-300 bg-brand-50 text-brand-700 hover:bg-brand-100 inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium"
           aria-label={`הצג את חברי הכנסת של סיעת ${party.name_he}`}
         >
           צפה בכל {party.mk_count} חברי הכנסת →

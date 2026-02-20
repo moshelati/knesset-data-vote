@@ -33,10 +33,7 @@ export class ETLRunTracker {
     }
   }
 
-  increment(
-    entityType: string,
-    field: "fetched" | "created" | "updated" | "failed",
-  ): void {
+  increment(entityType: string, field: "fetched" | "created" | "updated" | "failed"): void {
     this.initEntity(entityType);
     this.counts[entityType]![field]++;
   }

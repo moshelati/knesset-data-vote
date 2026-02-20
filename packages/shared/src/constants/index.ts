@@ -6,11 +6,7 @@ export const KNESSET_ODATA_METADATA = `${KNESSET_ODATA_BASE}/$metadata`;
 export const KNESSET_ODATA_V2_BASE = "https://knesset.gov.il/Odata/ParliamentInfo.svc";
 
 // Allowed domains for outbound fetches (SSRF prevention)
-export const ALLOWED_FETCH_DOMAINS = [
-  "knesset.gov.il",
-  "gov.il",
-  "main.knesset.gov.il",
-] as const;
+export const ALLOWED_FETCH_DOMAINS = ["knesset.gov.il", "gov.il", "main.knesset.gov.il"] as const;
 
 // Cache TTLs (seconds)
 export const CACHE_TTL = {
@@ -38,8 +34,9 @@ export const CURRENT_KNESSET_NUMBER = 25;
 
 export const METHODOLOGY_VERSION = "1.0.0";
 
-// Hebrew display labels for bill topics
-export const BILL_TOPIC_LABELS: Record<string, string> = {
+// Hebrew display labels for bill topics (UI: Hebrew)
+// Note: BILL_TOPIC_LABELS (English) is in schemas/bill.ts
+export const BILL_TOPIC_LABELS_HE: Record<string, string> = {
   economy: "כלכלה ומיסוי",
   security_defense: "ביטחון והגנה",
   social_welfare: "רווחה חברתית",
@@ -48,7 +45,7 @@ export const BILL_TOPIC_LABELS: Record<string, string> = {
   environment: "סביבה ואקלים",
   justice_law: "משפט וחוק",
   foreign_affairs: "יחסי חוץ",
-  housing: "דיור ונדל\"ן",
+  housing: 'דיור ונדל"ן',
   infrastructure: "תשתיות ותחבורה",
   religion_state: "דת ומדינה",
   immigration: "עלייה והגירה",
@@ -60,7 +57,16 @@ export const BILL_TOPIC_LABELS: Record<string, string> = {
 // Topic keyword mappings for static tagging
 export const TOPIC_KEYWORDS: Record<string, string[]> = {
   economy: ["כלכלה", "מס", "תקציב", "אוצר", "מיסוי", "פיננסי", "בנק"],
-  security_defense: ["ביטחון", "צבא", "הגנה", "מיליטרי", "ביטחון לאומי", "חרדים", "שירות לאומי", "גיוס"],
+  security_defense: [
+    "ביטחון",
+    "צבא",
+    "הגנה",
+    "מיליטרי",
+    "ביטחון לאומי",
+    "חרדים",
+    "שירות לאומי",
+    "גיוס",
+  ],
   social_welfare: ["רווחה", "סיוע", "קצבה", "עוני", "שוויון חברתי"],
   healthcare: ["בריאות", "רפואה", "בית חולים", "תרופה", "רופא"],
   education: ["חינוך", "בית ספר", "אוניברסיטה", "תלמיד", "מורה"],

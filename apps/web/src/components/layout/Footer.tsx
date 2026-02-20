@@ -36,7 +36,7 @@ export async function Footer() {
                 { href: "/methodology", label: "מתודולוגיה ומגבלות" },
               ].map(({ href, label }) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-neutral-600 hover:text-brand-700">
+                  <Link href={href} className="hover:text-brand-700 text-sm text-neutral-600">
                     {label}
                   </Link>
                 </li>
@@ -53,13 +53,13 @@ export async function Footer() {
                   href="https://knesset.gov.il/Odata/ParliamentInfo.svc"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-brand-600 hover:text-brand-800"
+                  className="text-brand-600 hover:text-brand-800 text-sm"
                 >
                   Knesset OData API ↗
                 </a>
               </li>
               <li>
-                <Link href="/methodology" className="text-sm text-neutral-600 hover:text-brand-700">
+                <Link href="/methodology" className="hover:text-brand-700 text-sm text-neutral-600">
                   שיטת חישוב ומגבלות
                 </Link>
               </li>
@@ -76,7 +76,7 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-neutral-200 pt-6 space-y-2">
+        <div className="mt-8 space-y-2 border-t border-neutral-200 pt-6">
           {/* Primary disclaimer */}
           <p className="text-center text-xs font-medium text-neutral-600">
             ⚠️ מיזם עצמאי — אינו אתר רשמי של הכנסת ואינו קשור אליה.{" "}
@@ -84,15 +84,16 @@ export async function Footer() {
               href="https://www.knesset.gov.il"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-600 underline hover:text-brand-800"
+              className="text-brand-600 hover:text-brand-800 underline"
             >
               לאתר הכנסת הרשמי ↗
             </a>
           </p>
           {/* Data disclaimer */}
           <p className="text-center text-xs text-neutral-400">
-            כל הנתונים מקורם ב-Knesset OData API בלבד. אין המצאה של טענות ואין מניפולציה של נתונים. ראו{" "}
-            <Link href="/methodology" className="underline hover:text-brand-700">
+            כל הנתונים מקורם ב-Knesset OData API בלבד. אין המצאה של טענות ואין מניפולציה של נתונים.
+            ראו{" "}
+            <Link href="/methodology" className="hover:text-brand-700 underline">
               מתודולוגיה ומגבלות
             </Link>{" "}
             לפירוט. האתר אינו מביע עמדה פוליטית.

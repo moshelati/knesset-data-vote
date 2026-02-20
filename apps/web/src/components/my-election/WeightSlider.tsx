@@ -15,12 +15,7 @@ const WEIGHT_LABELS: Record<number, string> = {
   5: "קריטי",
 };
 
-export function WeightSlider({
-  topicId,
-  label,
-  value,
-  onChange,
-}: WeightSliderProps) {
+export function WeightSlider({ topicId, label, value, onChange }: WeightSliderProps) {
   const sliderId = `weight-${topicId}`;
 
   return (
@@ -30,7 +25,7 @@ export function WeightSlider({
           {label}
         </label>
         <span
-          className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-700"
+          className="bg-brand-100 text-brand-700 rounded-full px-2 py-0.5 text-xs font-semibold"
           aria-live="polite"
           aria-label={`חשיבות: ${WEIGHT_LABELS[value] ?? value}`}
         >
@@ -47,7 +42,7 @@ export function WeightSlider({
           step={1}
           value={value}
           onChange={(e) => onChange(topicId, Number(e.target.value))}
-          className="h-2 flex-1 cursor-pointer appearance-none rounded-full bg-neutral-200 accent-brand-700"
+          className="accent-brand-700 h-2 flex-1 cursor-pointer appearance-none rounded-full bg-neutral-200"
           aria-valuemin={1}
           aria-valuemax={5}
           aria-valuenow={value}

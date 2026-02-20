@@ -6,12 +6,12 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "prettier"
+    "prettier",
   ],
   rules: {
     "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/consistent-type-imports": "error",
-    "no-console": ["warn", { allow: ["warn", "error", "info"] }]
-  }
+    "no-console": ["warn", { allow: ["warn", "error", "info"] }],
+  },
 };

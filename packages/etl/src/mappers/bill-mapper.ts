@@ -83,39 +83,39 @@ export interface RawBillStage {
 
 // Real StatusIDs from KNS_Status (TypeID=2, הצעת חוק)
 const STATUS_MAP: Record<number, string> = {
-  101: "first_reading",      // הכנה לקריאה ראשונה
-  104: "submitted",          // הונחה על שולחן הכנסת לדיון מוקדם
-  106: "committee_review",   // בוועדת הכנסת לקביעת הוועדה המטפלת
-  108: "first_reading",      // הכנה לקריאה ראשונה
-  109: "first_reading",      // אושרה בוועדה לקריאה ראשונה
-  110: "rejected",           // הבקשה לדין רציפות נדחתה במליאה
-  111: "first_reading",      // לדיון במליאה לקראת הקריאה הראשונה
-  113: "second_reading",     // הכנה לקריאה שנייה ושלישית
-  114: "second_reading",     // לדיון במליאה לקראת קריאה שנייה-שלישית
-  115: "third_reading",      // הוחזרה לוועדה להכנה לקריאה שלישית
-  117: "third_reading",      // לדיון במליאה לקראת קריאה שלישית
-  118: "passed",             // התקבלה בקריאה שלישית
-  120: "committee_review",   // לדיון במליאה על החלת דין רציפות
-  122: "withdrawn",          // מוזגה עם הצעת חוק אחרת
-  124: "withdrawn",          // הוסבה להצעה לסדר היום
-  130: "second_reading",     // הונחה על שולחן הכנסת לקריאה שנייה-שלישית
-  131: "third_reading",      // הונחה על שולחן הכנסת לקריאה שלישית
-  140: "withdrawn",          // להסרה מסדר היום לבקשת ועדה
-  141: "first_reading",      // הונחה על שולחן הכנסת לקריאה ראשונה
-  142: "committee_review",   // בוועדת הכנסת לקביעת הוועדה המטפלת
-  143: "withdrawn",          // להסרה מסדר היום לבקשת ועדה
-  150: "submitted",          // במליאה לדיון מוקדם
-  158: "committee_review",   // לאישור פיצול במליאה
-  161: "committee_review",   // לאישור פיצול במליאה
-  162: "committee_review",   // לאישור פיצול במליאה
-  165: "committee_review",   // לאישור פיצול במליאה
-  167: "first_reading",      // אושרה בוועדה לקריאה ראשונה
-  175: "committee_review",   // בדיון בוועדה על החלת דין רציפות
-  176: "rejected",           // הבקשה לדין רציפות נדחתה בוועדה
-  177: "withdrawn",          // נעצרה
-  178: "second_reading",     // אושרה בוועדה לקריאה שנייה-שלישית
-  179: "second_reading",     // אושרה בוועדה לקריאה שנייה-שלישית
-  181: "committee_review",   // הודעה על בקשה להחלת דין רציפות
+  101: "first_reading", // הכנה לקריאה ראשונה
+  104: "submitted", // הונחה על שולחן הכנסת לדיון מוקדם
+  106: "committee_review", // בוועדת הכנסת לקביעת הוועדה המטפלת
+  108: "first_reading", // הכנה לקריאה ראשונה
+  109: "first_reading", // אושרה בוועדה לקריאה ראשונה
+  110: "rejected", // הבקשה לדין רציפות נדחתה במליאה
+  111: "first_reading", // לדיון במליאה לקראת הקריאה הראשונה
+  113: "second_reading", // הכנה לקריאה שנייה ושלישית
+  114: "second_reading", // לדיון במליאה לקראת קריאה שנייה-שלישית
+  115: "third_reading", // הוחזרה לוועדה להכנה לקריאה שלישית
+  117: "third_reading", // לדיון במליאה לקראת קריאה שלישית
+  118: "passed", // התקבלה בקריאה שלישית
+  120: "committee_review", // לדיון במליאה על החלת דין רציפות
+  122: "withdrawn", // מוזגה עם הצעת חוק אחרת
+  124: "withdrawn", // הוסבה להצעה לסדר היום
+  130: "second_reading", // הונחה על שולחן הכנסת לקריאה שנייה-שלישית
+  131: "third_reading", // הונחה על שולחן הכנסת לקריאה שלישית
+  140: "withdrawn", // להסרה מסדר היום לבקשת ועדה
+  141: "first_reading", // הונחה על שולחן הכנסת לקריאה ראשונה
+  142: "committee_review", // בוועדת הכנסת לקביעת הוועדה המטפלת
+  143: "withdrawn", // להסרה מסדר היום לבקשת ועדה
+  150: "submitted", // במליאה לדיון מוקדם
+  158: "committee_review", // לאישור פיצול במליאה
+  161: "committee_review", // לאישור פיצול במליאה
+  162: "committee_review", // לאישור פיצול במליאה
+  165: "committee_review", // לאישור פיצול במליאה
+  167: "first_reading", // אושרה בוועדה לקריאה ראשונה
+  175: "committee_review", // בדיון בוועדה על החלת דין רציפות
+  176: "rejected", // הבקשה לדין רציפות נדחתה בוועדה
+  177: "withdrawn", // נעצרה
+  178: "second_reading", // אושרה בוועדה לקריאה שנייה-שלישית
+  179: "second_reading", // אושרה בוועדה לקריאה שנייה-שלישית
+  181: "committee_review", // הודעה על בקשה להחלת דין רציפות
 };
 
 function mapStatus(statusId?: number, statusDesc?: string | null): string {
@@ -125,7 +125,8 @@ function mapStatus(statusId?: number, statusDesc?: string | null): string {
     const desc = statusDesc;
     if (desc.includes("התקבלה")) return "passed";
     if (desc.includes("נדחה") || desc.includes("לא עבר")) return "rejected";
-    if (desc.includes("נעצרה") || desc.includes("מוזגה") || desc.includes("הוסבה")) return "withdrawn";
+    if (desc.includes("נעצרה") || desc.includes("מוזגה") || desc.includes("הוסבה"))
+      return "withdrawn";
     if (desc.includes("קריאה שלישית")) return "third_reading";
     if (desc.includes("קריאה שנייה")) return "second_reading";
     if (desc.includes("קריאה ראשונה")) return "first_reading";

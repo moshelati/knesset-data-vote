@@ -37,7 +37,13 @@ export async function promiseRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async (request, reply) => {
-      const { person, party, topic, page = 1, limit = 20 } = request.query as {
+      const {
+        person,
+        party,
+        topic,
+        page = 1,
+        limit = 20,
+      } = request.query as {
         person?: string;
         party?: string;
         topic?: string;
@@ -91,9 +97,7 @@ export async function promiseRoutes(app: FastifyInstance): Promise<void> {
               DATA_STATUS_LABELS[m.status as keyof typeof DATA_STATUS_LABELS] ??
               "Not available from source",
             status_date: m.status_date?.toISOString() ?? null,
-            bill: m.bill
-              ? { id: m.bill.id, title: m.bill.title_he, status: m.bill.status }
-              : null,
+            bill: m.bill ? { id: m.bill.id, title: m.bill.title_he, status: m.bill.status } : null,
           })),
         })),
         total,

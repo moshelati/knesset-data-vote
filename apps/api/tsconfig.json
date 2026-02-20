@@ -7,8 +7,5 @@
     "rootDir": "./src"
   },
   "include": ["src"],
-  "references": [
-    { "path": "../../packages/shared" },
-    { "path": "../../packages/db" }
-  ]
+  "references": [{ "path": "../../packages/shared" }, { "path": "../../packages/db" }]
 }

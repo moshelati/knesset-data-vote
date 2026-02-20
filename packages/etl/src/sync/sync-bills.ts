@@ -235,13 +235,29 @@ async function syncBillStages(
                 external_source: "knesset_odata",
                 stage_name_he: raw.StageName ?? raw.ReasonDesc ?? raw.StageDesc ?? "Unknown",
                 stage_name_en: null,
-                status: raw.ReasonDesc ? String(raw.ReasonDesc) : raw.StageDesc ? String(raw.StageDesc) : null,
-                stage_date: raw.StartDate ? new Date(raw.StartDate) : raw.StageDate ? new Date(raw.StageDate) : null,
+                status: raw.ReasonDesc
+                  ? String(raw.ReasonDesc)
+                  : raw.StageDesc
+                    ? String(raw.StageDesc)
+                    : null,
+                stage_date: raw.StartDate
+                  ? new Date(raw.StartDate)
+                  : raw.StageDate
+                    ? new Date(raw.StageDate)
+                    : null,
                 notes: null,
               },
               update: {
-                status: raw.ReasonDesc ? String(raw.ReasonDesc) : raw.StageDesc ? String(raw.StageDesc) : null,
-                stage_date: raw.StartDate ? new Date(raw.StartDate) : raw.StageDate ? new Date(raw.StageDate) : null,
+                status: raw.ReasonDesc
+                  ? String(raw.ReasonDesc)
+                  : raw.StageDesc
+                    ? String(raw.StageDesc)
+                    : null,
+                stage_date: raw.StartDate
+                  ? new Date(raw.StartDate)
+                  : raw.StageDate
+                    ? new Date(raw.StageDate)
+                    : null,
               },
             });
 

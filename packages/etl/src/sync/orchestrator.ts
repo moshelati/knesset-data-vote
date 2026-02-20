@@ -11,10 +11,7 @@
  * 7. Produce ETLRun report
  */
 
-import {
-  fetchODataMetadata,
-  parseODataMetadataXmlAsync,
-} from "../client/odata-metadata.js";
+import { fetchODataMetadata, parseODataMetadataXmlAsync } from "../client/odata-metadata.js";
 import { syncParties } from "./sync-parties.js";
 import { syncMKs } from "./sync-mks.js";
 import { syncBills } from "./sync-bills.js";
@@ -52,9 +49,7 @@ export async function runSync(options: SyncOptions = {}): Promise<ETLRunResult> 
       const errMsg = `Failed to fetch OData metadata from ${metadataUrl}: ${String(err)}`;
       logger.error({ err, metadataUrl }, errMsg);
       tracker.addError(errMsg);
-      logger.warn(
-        "OData unavailable. Run `pnpm db:seed` to load demo data for UI testing.",
-      );
+      logger.warn("OData unavailable. Run `pnpm db:seed` to load demo data for UI testing.");
       return await tracker.complete("failed");
     }
 
@@ -76,10 +71,7 @@ export async function runSync(options: SyncOptions = {}): Promise<ETLRunResult> 
     // Determine final status
     const summary = tracker.getSummary();
     const hasErrors = summary.errors.length > 0;
-    const totalFetched = Object.values(summary.counts).reduce(
-      (sum, c) => sum + c.fetched,
-      0,
-    );
+    const totalFetched = Object.values(summary.counts).reduce((sum, c) => sum + c.fetched, 0);
     const hasData = totalFetched > 0;
 
     let status: "completed" | "partial" | "failed";

@@ -50,8 +50,14 @@ vi.mock("@knesset-vote/db", () => ({
 vi.mock("../plugins/redis.js", () => ({
   setupRedis: vi.fn().mockResolvedValue(undefined),
   getRedis: vi.fn().mockReturnValue(null),
-  getCached: vi.fn().mockImplementation((_key: string, _ttl: number, fetcher: () => unknown) => fetcher()),
-  buildCacheKey: vi.fn().mockImplementation((route: string, params: Record<string, unknown>) => `${route}:${JSON.stringify(params)}`),
+  getCached: vi
+    .fn()
+    .mockImplementation((_key: string, _ttl: number, fetcher: () => unknown) => fetcher()),
+  buildCacheKey: vi
+    .fn()
+    .mockImplementation(
+      (route: string, params: Record<string, unknown>) => `${route}:${JSON.stringify(params)}`,
+    ),
 }));
 
 let app: FastifyInstance;
@@ -190,7 +196,12 @@ describe("POST /api/promises without API_KEY", () => {
     const res = await app.inject({
       method: "POST",
       url: "/api/promises",
-      payload: { text: "test", category: "statement", source_url: "https://example.com", source_label: "Test" },
+      payload: {
+        text: "test",
+        category: "statement",
+        source_url: "https://example.com",
+        source_label: "Test",
+      },
     });
     expect(res.statusCode).toBe(404);
   });

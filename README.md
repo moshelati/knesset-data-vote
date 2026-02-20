@@ -56,22 +56,22 @@ knesset-vote/
 
 ## Commands Reference
 
-| Command | Description |
-|---|---|
-| `pnpm i` | Install all workspace dependencies |
-| `docker compose up -d` | Start Postgres + Redis |
-| `pnpm db:migrate` | Run Prisma migrations (dev) |
-| `pnpm db:migrate:deploy` | Run migrations (production) |
-| `pnpm db:seed` | Seed demo data (marked `is_demo=true`) |
-| `pnpm db:studio` | Open Prisma Studio |
-| `pnpm etl:sync` | Sync all data from Knesset OData API |
-| `pnpm etl:sync:demo` | Show demo mode info |
-| `pnpm dev` | Start all apps in dev mode |
-| `pnpm build` | Build all packages |
-| `pnpm lint` | Lint all packages |
-| `pnpm format` | Format with Prettier |
-| `pnpm test` | Run unit + API tests |
-| `pnpm test:e2e` | Run Playwright E2E tests |
+| Command                  | Description                            |
+| ------------------------ | -------------------------------------- |
+| `pnpm i`                 | Install all workspace dependencies     |
+| `docker compose up -d`   | Start Postgres + Redis                 |
+| `pnpm db:migrate`        | Run Prisma migrations (dev)            |
+| `pnpm db:migrate:deploy` | Run migrations (production)            |
+| `pnpm db:seed`           | Seed demo data (marked `is_demo=true`) |
+| `pnpm db:studio`         | Open Prisma Studio                     |
+| `pnpm etl:sync`          | Sync all data from Knesset OData API   |
+| `pnpm etl:sync:demo`     | Show demo mode info                    |
+| `pnpm dev`               | Start all apps in dev mode             |
+| `pnpm build`             | Build all packages                     |
+| `pnpm lint`              | Lint all packages                      |
+| `pnpm format`            | Format with Prettier                   |
+| `pnpm test`              | Run unit + API tests                   |
+| `pnpm test:e2e`          | Run Playwright E2E tests               |
 
 ---
 
@@ -113,6 +113,7 @@ Web (apps/web)
 
 The ETL **never hardcodes entity set names**. It fetches `$metadata`, parses the XML,
 and discovers available entity sets dynamically. See:
+
 - `packages/etl/src/client/odata-metadata.ts` — metadata parser
 - `packages/etl/src/client/odata-client.ts` — typed OData client
 
@@ -120,15 +121,15 @@ and discovers available entity sets dynamically. See:
 
 The ETL tries multiple candidate names for each entity type (in priority order):
 
-| Entity | Candidates |
-|---|---|
+| Entity             | Candidates                                    |
+| ------------------ | --------------------------------------------- |
 | Parties (Factions) | `KnssFaction`, `Faction`, `ParliamentFaction` |
-| MKs (Members) | `KnssMember`, `Person`, `MK`, `Member` |
-| Bills | `KnssBill`, `Bill`, `PrivateBill` |
-| Committees | `KnssCommittee`, `Committee` |
-| MK-Faction | `KnssMemberFaction`, `MemberFaction` |
-| Bill Initiators | `KnssBillInitiator`, `BillInitiator` |
-| Bill Stages | `KnssBillHistoryByStage`, `BillHistory` |
+| MKs (Members)      | `KnssMember`, `Person`, `MK`, `Member`        |
+| Bills              | `KnssBill`, `Bill`, `PrivateBill`             |
+| Committees         | `KnssCommittee`, `Committee`                  |
+| MK-Faction         | `KnssMemberFaction`, `MemberFaction`          |
+| Bill Initiators    | `KnssBillInitiator`, `BillInitiator`          |
+| Bill Stages        | `KnssBillHistoryByStage`, `BillHistory`       |
 
 If an entity set is not found, that feature is gracefully omitted with a log warning.
 
@@ -142,6 +143,7 @@ Only domains in `ALLOWED_FETCH_DOMAINS` are permitted: `knesset.gov.il`, `gov.il
 ## API
 
 All endpoints return:
+
 ```json
 {
   "data": {...},
@@ -151,19 +153,19 @@ All endpoints return:
 }
 ```
 
-| Endpoint | Description |
-|---|---|
-| `GET /api/health` | Health check |
-| `GET /api/meta` | Data sources, last sync, ETL summary |
-| `GET /api/parties?search=` | List parties |
-| `GET /api/parties/:id` | Party detail + activity summary |
-| `GET /api/mks?party_id=&search=` | List MKs |
-| `GET /api/mks/:id` | MK profile + metrics + bills + memberships |
-| `GET /api/bills?search=&topic=&status=` | List bills |
-| `GET /api/bills/:id` | Bill detail + sponsors + stage history |
-| `GET /api/search?q=` | Unified search (MK, party, bill) |
-| `GET /api/promises` | Statements/commitments list |
-| `POST /api/promises` | Add statement (requires `API_KEY`) |
+| Endpoint                                | Description                                |
+| --------------------------------------- | ------------------------------------------ |
+| `GET /api/health`                       | Health check                               |
+| `GET /api/meta`                         | Data sources, last sync, ETL summary       |
+| `GET /api/parties?search=`              | List parties                               |
+| `GET /api/parties/:id`                  | Party detail + activity summary            |
+| `GET /api/mks?party_id=&search=`        | List MKs                                   |
+| `GET /api/mks/:id`                      | MK profile + metrics + bills + memberships |
+| `GET /api/bills?search=&topic=&status=` | List bills                                 |
+| `GET /api/bills/:id`                    | Bill detail + sponsors + stage history     |
+| `GET /api/search?q=`                    | Unified search (MK, party, bill)           |
+| `GET /api/promises`                     | Statements/commitments list                |
+| `POST /api/promises`                    | Add statement (requires `API_KEY`)         |
 
 Swagger UI: http://localhost:3001/docs
 
@@ -172,6 +174,7 @@ Swagger UI: http://localhost:3001/docs
 ## Database Schema
 
 Key models:
+
 - `Party` → `PartyMembership` ← `MK`
 - `MK` → `MKBillRole` ← `Bill`
 - `Bill` → `BillStage`
@@ -186,42 +189,49 @@ Key models:
 
 ## Security
 
-| Layer | Implementation |
-|---|---|
-| Input validation | Zod schemas on all API inputs |
-| Rate limiting | 100 req/min per IP (`@fastify/rate-limit`) |
-| Security headers | Helmet (`X-Frame-Options`, `CSP`, etc.) |
-| SSRF prevention | Domain allowlist for all outbound fetches |
-| SQL injection | Prisma parameterized queries only |
-| XSS | React server components + Next.js CSP headers |
+| Layer            | Implementation                                |
+| ---------------- | --------------------------------------------- |
+| Input validation | Zod schemas on all API inputs                 |
+| Rate limiting    | 100 req/min per IP (`@fastify/rate-limit`)    |
+| Security headers | Helmet (`X-Frame-Options`, `CSP`, etc.)       |
+| SSRF prevention  | Domain allowlist for all outbound fetches     |
+| SQL injection    | Prisma parameterized queries only             |
+| XSS              | React server components + Next.js CSP headers |
 
 ---
 
 ## Known TODOs & Limitations
 
 ### OData Entity Sets
+
 After running `pnpm etl:sync` for the first time, check logs for discovered entity set names.
 If a candidate name doesn't match, add it to the `*_ENTITY_SET_CANDIDATES` arrays in:
+
 - `packages/etl/src/mappers/party-mapper.ts`
 - `packages/etl/src/mappers/mk-mapper.ts`
 - `packages/etl/src/mappers/bill-mapper.ts`
 - `packages/etl/src/mappers/committee-mapper.ts`
 
 ### Votes Data
+
 Vote records depend on entity `VoteRecord` being available in OData. If not present,
 the feature displays "Not available from source" rather than failing.
 
 ### AI Summaries
+
 AI bill summarization is infrastructure-ready (model: `BillAISummary`). To enable:
+
 1. Set `OPENAI_API_KEY` in `.env`
 2. Implement `packages/etl/src/sync/sync-ai-summaries.ts`
 3. Generate summaries ONLY from `description_he` fields (never invented)
 
 ### Images
+
 MK profile photos are not in OData. Future: scrape `knesset.gov.il/mk` pages for photo URLs
 (requires careful rate limiting and robots.txt compliance).
 
 ### NLP Topic Classification
+
 Currently uses keyword matching. Future: Hebrew NLP model for better accuracy.
 
 ---
@@ -251,6 +261,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 Optional:
+
 ```
 API_KEY=           # Enables POST /api/promises
 OPENAI_API_KEY=    # Enables AI bill summaries

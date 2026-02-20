@@ -18,10 +18,7 @@ interface MKsResponse {
   pages: number;
 }
 
-async function getMKs(opts: {
-  search?: string;
-  party_id?: string;
-}): Promise<MKsResponse | null> {
+async function getMKs(opts: { search?: string; party_id?: string }): Promise<MKsResponse | null> {
   try {
     const params = new URLSearchParams();
     if (opts.search) params.set("search", opts.search);
@@ -66,11 +63,11 @@ export default async function MKsPage({
           name="search"
           defaultValue={search}
           placeholder="חפש שם..."
-          className="flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          className="focus:border-brand-500 flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:outline-none"
         />
         <button
           type="submit"
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+          className="bg-brand-600 hover:bg-brand-700 rounded-lg px-4 py-2 text-sm font-medium text-white"
         >
           חפש
         </button>
@@ -104,13 +101,13 @@ export default async function MKsPage({
             >
               {/* Avatar placeholder */}
               <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 text-sm font-semibold"
+                className="bg-brand-100 text-brand-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
                 aria-hidden="true"
               >
                 {mk.name_he.charAt(0)}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-neutral-900 group-hover:text-brand-700">
+                <p className="group-hover:text-brand-700 truncate font-medium text-neutral-900">
                   {mk.name_he}
                 </p>
                 {mk.current_party_name && (

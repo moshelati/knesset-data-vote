@@ -43,9 +43,7 @@ export function SourceBadge({ sources, compact = false }: SourceBadgeProps) {
         >
           <ExternalLink className="h-3 w-3" aria-hidden="true" />
           <span>{source.label}</span>
-          {source.external_id && (
-            <span className="text-neutral-400">#{source.external_id}</span>
-          )}
+          {source.external_id && <span className="text-neutral-400">#{source.external_id}</span>}
         </a>
       ))}
     </div>

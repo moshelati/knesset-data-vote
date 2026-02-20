@@ -10,6 +10,7 @@
     "sync": "tsx src/cli.ts sync",
     "sync:demo": "tsx src/cli.ts sync --demo",
     "aggregate": "tsx src/aggregate/cli-aggregate.ts aggregate",
+    "backfill": "tsx src/cli.ts backfill",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "test": "vitest run",

@@ -110,7 +110,9 @@ async function main() {
     const url = `${VOTES_V4_BASE}/${VOTE_RECORD_ENTITY}?$filter=${encodeURIComponent(filterParts)}&$top=1000&$format=json`;
 
     try {
-      console.log(`  Batch ${batchNum}/${Math.ceil(voteOdataIds.length / BATCH_SIZE)}: fetching records for ${batch.length} votes`);
+      console.log(
+        `  Batch ${batchNum}/${Math.ceil(voteOdataIds.length / BATCH_SIZE)}: fetching records for ${batch.length} votes`,
+      );
       const res = await fetch(url);
       if (!res.ok) {
         console.warn(`  HTTP ${res.status} — skipping batch`);
@@ -163,7 +165,8 @@ async function main() {
       for (const [odataId, counts] of voteCounts) {
         const voteDbId = voteIdMap.get(odataId);
         if (!voteDbId) continue;
-        const result = counts.yes > counts.no ? "passed" : counts.no > counts.yes ? "rejected" : "unknown";
+        const result =
+          counts.yes > counts.no ? "passed" : counts.no > counts.yes ? "rejected" : "unknown";
         try {
           await db.vote.update({
             where: { id: voteDbId },
@@ -174,9 +177,10 @@ async function main() {
               result,
             },
           });
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
-
     } catch (err) {
       console.warn(`  Batch ${batchNum} failed: ${err}`);
     }

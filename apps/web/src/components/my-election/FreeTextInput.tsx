@@ -50,7 +50,7 @@ export function FreeTextInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="לדוגמה: דיור, ביטחון, תחבורה..."
-        className="w-full resize-none rounded-lg border border-neutral-300 px-4 py-3 text-sm text-neutral-800 placeholder-neutral-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+        className="focus:border-brand-500 focus:ring-brand-500 w-full resize-none rounded-lg border border-neutral-300 px-4 py-3 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-1"
         dir="rtl"
         aria-describedby={newSuggestions.length > 0 ? "freetext-suggestions" : undefined}
       />
@@ -69,7 +69,7 @@ export function FreeTextInput({
                 key={s.topicId}
                 type="button"
                 onClick={() => onAddTopic(s.topicId)}
-                className="rounded-full border border-brand-300 bg-brand-50 px-3 py-1 text-xs text-brand-700 transition hover:bg-brand-100"
+                className="border-brand-300 bg-brand-50 text-brand-700 hover:bg-brand-100 rounded-full border px-3 py-1 text-xs transition"
               >
                 + {s.labelHe}
                 <span className="ml-1 text-neutral-400">({s.keyword})</span>

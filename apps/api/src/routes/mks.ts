@@ -24,15 +24,21 @@ export async function mkRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async (request, reply) => {
-      const { search, party_id, is_current = true, sort, page = 1, limit = 20 } =
-        request.query as {
-          search?: string;
-          party_id?: string;
-          is_current?: boolean;
-          sort?: string;
-          page?: number;
-          limit?: number;
-        };
+      const {
+        search,
+        party_id,
+        is_current = true,
+        sort,
+        page = 1,
+        limit = 20,
+      } = request.query as {
+        search?: string;
+        party_id?: string;
+        is_current?: boolean;
+        sort?: string;
+        page?: number;
+        limit?: number;
+      };
 
       const cacheKey = buildCacheKey("mks", { search, party_id, is_current, sort, page, limit });
       const result = await getCached(cacheKey, CACHE_TTL.SHORT, () =>

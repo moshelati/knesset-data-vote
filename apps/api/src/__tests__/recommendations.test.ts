@@ -96,13 +96,14 @@ vi.mock("@knesset-vote/db", () => ({
 vi.mock("../plugins/redis.js", () => ({
   setupRedis: vi.fn().mockResolvedValue(undefined),
   getRedis: vi.fn().mockReturnValue(null),
-  getCached: vi.fn().mockImplementation(
-    (_key: string, _ttl: number, fetcher: () => unknown) => fetcher(),
-  ),
-  buildCacheKey: vi.fn().mockImplementation(
-    (route: string, params: Record<string, unknown>) =>
-      `${route}:${JSON.stringify(params)}`,
-  ),
+  getCached: vi
+    .fn()
+    .mockImplementation((_key: string, _ttl: number, fetcher: () => unknown) => fetcher()),
+  buildCacheKey: vi
+    .fn()
+    .mockImplementation(
+      (route: string, params: Record<string, unknown>) => `${route}:${JSON.stringify(params)}`,
+    ),
 }));
 
 let app: FastifyInstance;

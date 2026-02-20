@@ -3,9 +3,7 @@ import { RecommendationRequestSchema, CACHE_TTL } from "@knesset-vote/shared";
 import { getCached, buildCacheKey } from "../plugins/redis.js";
 import { getRecommendations } from "../services/recommendation-service.js";
 
-export async function recommendationRoutes(
-  app: FastifyInstance,
-): Promise<void> {
+export async function recommendationRoutes(app: FastifyInstance): Promise<void> {
   app.post(
     "/api/recommendations",
     {
@@ -41,8 +39,7 @@ export async function recommendationRoutes(
             ideological_preference: {
               type: "string",
               enum: ["right", "center", "left", "none"],
-              description:
-                "UI-only preference — accepted but NOT used in scoring (guardrail 1)",
+              description: "UI-only preference — accepted but NOT used in scoring (guardrail 1)",
             },
           },
         },
@@ -90,10 +87,8 @@ export async function recommendationRoutes(
         .join(",");
       const cacheKey = buildCacheKey("recommendations", { t: sortedTopics });
 
-      const result = await getCached(
-        cacheKey,
-        CACHE_TTL.LONG,
-        () => getRecommendations(parsed.data),
+      const result = await getCached(cacheKey, CACHE_TTL.LONG, () =>
+        getRecommendations(parsed.data),
       );
 
       if (result === null) {

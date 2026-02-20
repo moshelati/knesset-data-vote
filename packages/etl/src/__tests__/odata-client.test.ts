@@ -3,10 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  parseODataMetadataXmlAsync,
-  findEntitySet,
-} from "../client/odata-metadata.js";
+import { parseODataMetadataXmlAsync, findEntitySet } from "../client/odata-metadata.js";
 import { assertAllowedUrl } from "../client/ssrf-guard.js";
 
 // Sample OData $metadata XML (simplified but realistic)
@@ -66,9 +63,7 @@ describe("OData Metadata Parser", () => {
     );
 
     const faction = metadata.entitySets.find((es) => es.name === "KnssFaction");
-    expect(faction?.url).toBe(
-      "https://knesset.gov.il/Odata/ParliamentInfo.svc/KnssFaction",
-    );
+    expect(faction?.url).toBe("https://knesset.gov.il/Odata/ParliamentInfo.svc/KnssFaction");
   });
 
   it("parses entity type properties", async () => {
@@ -141,15 +136,11 @@ describe("findEntitySet", () => {
 
 describe("SSRF Guard", () => {
   it("allows knesset.gov.il", () => {
-    expect(() =>
-      assertAllowedUrl("https://knesset.gov.il/Odata/ParliamentInfo.svc"),
-    ).not.toThrow();
+    expect(() => assertAllowedUrl("https://knesset.gov.il/Odata/ParliamentInfo.svc")).not.toThrow();
   });
 
   it("allows main.knesset.gov.il subdomain", () => {
-    expect(() =>
-      assertAllowedUrl("https://main.knesset.gov.il/test"),
-    ).not.toThrow();
+    expect(() => assertAllowedUrl("https://main.knesset.gov.il/test")).not.toThrow();
   });
 
   it("allows gov.il", () => {
@@ -157,21 +148,15 @@ describe("SSRF Guard", () => {
   });
 
   it("blocks arbitrary domains", () => {
-    expect(() =>
-      assertAllowedUrl("https://malicious.com/steal-data"),
-    ).toThrow(/SSRF protection/);
+    expect(() => assertAllowedUrl("https://malicious.com/steal-data")).toThrow(/SSRF protection/);
   });
 
   it("blocks internal IPs", () => {
-    expect(() =>
-      assertAllowedUrl("http://169.254.169.254/metadata"),
-    ).toThrow(/SSRF protection/);
+    expect(() => assertAllowedUrl("http://169.254.169.254/metadata")).toThrow(/SSRF protection/);
   });
 
   it("blocks localhost", () => {
-    expect(() =>
-      assertAllowedUrl("http://localhost:8080/internal"),
-    ).toThrow(/SSRF protection/);
+    expect(() => assertAllowedUrl("http://localhost:8080/internal")).toThrow(/SSRF protection/);
   });
 
   it("throws on invalid URL", () => {

@@ -36,8 +36,14 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 const STAGE_ORDER = [
-  "submitted", "committee_review", "first_reading", "second_reading",
-  "third_reading", "passed", "rejected", "withdrawn",
+  "submitted",
+  "committee_review",
+  "first_reading",
+  "second_reading",
+  "third_reading",
+  "passed",
+  "rejected",
+  "withdrawn",
 ];
 
 export default async function BillPage({ params }: { params: { id: string } }) {
@@ -63,9 +69,7 @@ export default async function BillPage({ params }: { params: { id: string } }) {
           <BillStatusBadge status={bill.status ?? "unknown"} />
         </div>
 
-        {bill.title_en && (
-          <p className="mt-2 text-neutral-500">{bill.title_en}</p>
-        )}
+        {bill.title_en && <p className="mt-2 text-neutral-500">{bill.title_en}</p>}
 
         <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-neutral-600">
           {bill.topic && bill.topic in BILL_TOPIC_LABELS && (
@@ -74,14 +78,12 @@ export default async function BillPage({ params }: { params: { id: string } }) {
             </span>
           )}
           {bill.knesset_number && <span>כנסת {bill.knesset_number}</span>}
-          {bill.submitted_date && (
-            <span>הוגשה: {formatDate(bill.submitted_date)}</span>
-          )}
+          {bill.submitted_date && <span>הוגשה: {formatDate(bill.submitted_date)}</span>}
         </div>
 
         {/* Sources */}
         <div className="mt-4">
-          <span className="text-xs font-medium text-neutral-500 mr-2">מקורות:</span>
+          <span className="mr-2 text-xs font-medium text-neutral-500">מקורות:</span>
           <SourceBadge sources={bill.sources} />
         </div>
 
@@ -90,7 +92,7 @@ export default async function BillPage({ params }: { params: { id: string } }) {
             href={bill.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-sm text-brand-600 hover:underline"
+            className="text-brand-600 mt-2 inline-flex items-center gap-1 text-sm hover:underline"
           >
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
             צפה במקור הרשמי בכנסת
@@ -103,7 +105,10 @@ export default async function BillPage({ params }: { params: { id: string } }) {
 
       {/* AI Summary (if available) */}
       {bill.ai_summary && (
-        <section className="mb-8 rounded-lg border border-amber-200 bg-amber-50 p-5" aria-labelledby="ai-summary-heading">
+        <section
+          className="mb-8 rounded-lg border border-amber-200 bg-amber-50 p-5"
+          aria-labelledby="ai-summary-heading"
+        >
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
             <div>
@@ -168,12 +173,15 @@ export default async function BillPage({ params }: { params: { id: string } }) {
             היסטוריית מצב
           </h2>
           <div className="relative">
-            <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-neutral-200" aria-hidden="true" />
+            <div
+              className="absolute bottom-0 right-4 top-0 w-0.5 bg-neutral-200"
+              aria-hidden="true"
+            />
             <div className="space-y-4">
               {bill.stage_history.map((stage, index) => (
                 <div key={stage.id} className="relative flex items-start gap-4">
                   <div
-                    className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white border-2 border-brand-400 text-xs font-bold text-brand-600"
+                    className="border-brand-400 text-brand-600 relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 bg-white text-xs font-bold"
                     aria-hidden="true"
                   >
                     {index + 1}
@@ -186,9 +194,7 @@ export default async function BillPage({ params }: { params: { id: string } }) {
                     {stage.date && (
                       <p className="mt-1 text-xs text-neutral-400">{formatDateShort(stage.date)}</p>
                     )}
-                    {stage.notes && (
-                      <p className="mt-1 text-xs text-neutral-500">{stage.notes}</p>
-                    )}
+                    {stage.notes && <p className="mt-1 text-xs text-neutral-500">{stage.notes}</p>}
                   </div>
                 </div>
               ))}

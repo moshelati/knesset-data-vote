@@ -37,8 +37,11 @@ async function fetchAll<T>(entity: string, filter?: string): Promise<T[]> {
 }
 
 interface RawCommittee {
-  CommitteeID?: number; Id?: number; ID?: number;
-  Name?: string; CommitteeName?: string;
+  CommitteeID?: number;
+  Id?: number;
+  ID?: number;
+  Name?: string;
+  CommitteeName?: string;
   CategoryDesc?: string | null;
   CommitteeTypeDesc?: string | null;
   AdditionalTypeDesc?: string | null;
@@ -112,19 +115,22 @@ async function main() {
 
   // ── 3. Fetch PersonToPosition filtered to CommitteeID ne null ───────────────
   console.log("\nFetching KNS_PersonToPosition (CommitteeID ne null)…");
-  const rawPositions = await fetchAll<RawPosition>(
-    "KNS_PersonToPosition",
-    "CommitteeID ne null",
-  );
+  const rawPositions = await fetchAll<RawPosition>("KNS_PersonToPosition", "CommitteeID ne null");
   console.log(`  ${rawPositions.length} committee-position rows fetched`);
 
   let memberCount = 0;
   let skipped = 0;
   for (const raw of rawPositions) {
-    if (!raw.CommitteeID || !raw.PersonID) { skipped++; continue; }
+    if (!raw.CommitteeID || !raw.PersonID) {
+      skipped++;
+      continue;
+    }
     const committeeDbId = committeeMap.get(String(raw.CommitteeID));
     const mkDbId = mkMap.get(String(raw.PersonID));
-    if (!committeeDbId || !mkDbId) { skipped++; continue; }
+    if (!committeeDbId || !mkDbId) {
+      skipped++;
+      continue;
+    }
 
     try {
       await db.committeeMembership.upsert({
@@ -147,10 +153,14 @@ async function main() {
       });
       memberCount++;
     } catch (err) {
-      console.warn(`  Failed membership PersonID=${raw.PersonID} CommitteeID=${raw.CommitteeID}: ${err}`);
+      console.warn(
+        `  Failed membership PersonID=${raw.PersonID} CommitteeID=${raw.CommitteeID}: ${err}`,
+      );
     }
   }
-  console.log(`  Upserted ${memberCount} committee memberships (${skipped} skipped — MK/committee not in DB)`);
+  console.log(
+    `  Upserted ${memberCount} committee memberships (${skipped} skipped — MK/committee not in DB)`,
+  );
 
   // ── Final summary ────────────────────────────────────────────────────────────
   const counts = await db.$queryRaw<{ committees: bigint; memberships: bigint }[]>`
@@ -159,7 +169,9 @@ async function main() {
       (SELECT COUNT(*) FROM "CommitteeMembership") as memberships
   `;
   const { committees, memberships } = counts[0];
-  console.log(`\n✅ Done! DB now has ${committees} committees and ${memberships} committee memberships`);
+  console.log(
+    `\n✅ Done! DB now has ${committees} committees and ${memberships} committee memberships`,
+  );
   console.log("   Visit http://localhost:3000/mks to see updated profiles");
 
   await db.$disconnect();

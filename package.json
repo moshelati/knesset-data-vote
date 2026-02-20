@@ -22,6 +22,7 @@
     "etl:sync": "pnpm --filter @knesset-vote/etl sync",
     "etl:sync:demo": "pnpm --filter @knesset-vote/etl sync:demo",
     "etl:aggregate": "pnpm --filter @knesset-vote/etl aggregate",
+    "etl:backfill": "pnpm --filter @knesset-vote/etl backfill",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore"
   },

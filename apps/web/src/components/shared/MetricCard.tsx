@@ -18,8 +18,7 @@ export function MetricCard({
   confidence,
   className,
 }: MetricCardProps) {
-  const displayValue =
-    value === null || value === undefined ? "לא זמין ממקור" : String(value);
+  const displayValue = value === null || value === undefined ? "לא זמין ממקור" : String(value);
 
   return (
     <div className={cn("card p-4", className)}>
@@ -51,7 +50,7 @@ export function MetricCard({
             href={source}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-brand-600 hover:underline"
+            className="text-brand-600 text-xs hover:underline"
           >
             מקור ↗
           </a>
@@ -60,10 +59,7 @@ export function MetricCard({
       {confidence && (
         <div className="mt-1">
           <span
-            className={cn(
-              "text-xs",
-              confidence === "high" ? "text-green-600" : "text-neutral-400",
-            )}
+            className={cn("text-xs", confidence === "high" ? "text-green-600" : "text-neutral-400")}
           >
             {confidence === "high"
               ? "✓ High confidence"

@@ -62,7 +62,10 @@ function VoteBar({
   const abstainPct = ((abstain ?? 0) / total) * 100;
 
   return (
-    <div className="mt-2 flex h-2 w-full overflow-hidden rounded-full bg-neutral-100" aria-hidden="true">
+    <div
+      className="mt-2 flex h-2 w-full overflow-hidden rounded-full bg-neutral-100"
+      aria-hidden="true"
+    >
       <div className="bg-green-500" style={{ width: `${yesPct}%` }} />
       <div className="bg-red-500" style={{ width: `${noPct}%` }} />
       <div className="bg-neutral-400" style={{ width: `${abstainPct}%` }} />
@@ -87,9 +90,7 @@ export default async function VotesPage({
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-neutral-900">הצבעות במליאה</h1>
         <p className="mt-2 text-neutral-600">
-          {response?.total != null
-            ? `${response.total.toLocaleString("he-IL")} הצבעות`
-            : "טוען..."}{" "}
+          {response?.total != null ? `${response.total.toLocaleString("he-IL")} הצבעות` : "טוען..."}{" "}
           • נתונים מ-Knesset OData v4
         </p>
       </div>
@@ -124,7 +125,7 @@ export default async function VotesPage({
 
         <button
           type="submit"
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+          className="bg-brand-600 hover:bg-brand-700 rounded-lg px-4 py-2 text-sm font-medium text-white"
         >
           סנן
         </button>
@@ -174,16 +175,14 @@ export default async function VotesPage({
                 aria-label={`עיין בהצבעה: ${vote.title_he}`}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h2 className="font-semibold text-neutral-900 group-hover:text-brand-700 truncate">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="group-hover:text-brand-700 truncate font-semibold text-neutral-900">
                       {vote.title_he}
                     </h2>
                     <div className="mt-2 flex flex-wrap items-center gap-3">
                       <VoteResultBadge result={vote.result} />
                       {vote.knesset_number && (
-                        <span className="text-xs text-neutral-400">
-                          כנסת {vote.knesset_number}
-                        </span>
+                        <span className="text-xs text-neutral-400">כנסת {vote.knesset_number}</span>
                       )}
                       {vote.vote_date && (
                         <span className="text-xs text-neutral-400">
@@ -192,7 +191,7 @@ export default async function VotesPage({
                       )}
                       {/* Yes/No/Abstain counts */}
                       {(vote.yes_count != null || vote.no_count != null) && (
-                        <span className="text-xs text-neutral-500 flex items-center gap-2">
+                        <span className="flex items-center gap-2 text-xs text-neutral-500">
                           <span className="text-green-600">בעד {vote.yes_count ?? 0}</span>
                           <span className="text-red-600">נגד {vote.no_count ?? 0}</span>
                           {vote.abstain_count != null && vote.abstain_count > 0 && (
@@ -201,11 +200,7 @@ export default async function VotesPage({
                         </span>
                       )}
                     </div>
-                    <VoteBar
-                      yes={vote.yes_count}
-                      no={vote.no_count}
-                      abstain={vote.abstain_count}
-                    />
+                    <VoteBar yes={vote.yes_count} no={vote.no_count} abstain={vote.abstain_count} />
                   </div>
                 </div>
               </Link>

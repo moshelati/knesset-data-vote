@@ -19,10 +19,10 @@ import {
 } from "./mappers/vote-mapper.js";
 
 const PAGE_SIZE = 100;
-const START_PAGE = 3;   // skip first 300 (already seeded)
-const END_PAGE   = 23;  // fetch pages 4–23 → 2000 more votes
+const START_PAGE = 3; // skip first 300 (already seeded)
+const END_PAGE = 23; // fetch pages 4–23 → 2000 more votes
 const BATCH_SIZE = 10;
-const DELAY_MS   = 350;
+const DELAY_MS = 350;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -45,14 +45,18 @@ async function main() {
   console.log(`MKs in DB: ${mks.length}`);
 
   // Fetch vote headers pages START_PAGE..END_PAGE
-  console.log(`\nFetching vote pages ${START_PAGE + 1}–${END_PAGE} (${(END_PAGE - START_PAGE) * PAGE_SIZE} votes)...`);
+  console.log(
+    `\nFetching vote pages ${START_PAGE + 1}–${END_PAGE} (${(END_PAGE - START_PAGE) * PAGE_SIZE} votes)...`,
+  );
   const allHeaders: RawVoteHeader[] = [];
 
   for (let p = START_PAGE; p < END_PAGE; p++) {
     const skip = p * PAGE_SIZE;
     const page = await fetchPage<RawVoteHeader>(VOTE_HEADER_ENTITY, skip, "VoteDateTime desc");
     allHeaders.push(...page);
-    process.stdout.write(`  page ${p + 1}/${END_PAGE}: ${page.length} votes (total ${allHeaders.length})\n`);
+    process.stdout.write(
+      `  page ${p + 1}/${END_PAGE}: ${page.length} votes (total ${allHeaders.length})\n`,
+    );
     if (page.length < PAGE_SIZE) break;
     await sleep(DELAY_MS);
   }
@@ -108,7 +112,10 @@ async function main() {
         `  batch ${batchNum}/${Math.ceil(voteOdataIds.length / BATCH_SIZE)}: fetching...`,
       );
       const res = await fetch(url);
-      if (!res.ok) { console.warn(` HTTP ${res.status} — skip`); continue; }
+      if (!res.ok) {
+        console.warn(` HTTP ${res.status} — skip`);
+        continue;
+      }
       const data = (await res.json()) as { value?: RawVoteRecord[] };
       const records = data.value ?? [];
       process.stdout.write(` ${records.length} records\n`);
@@ -141,7 +148,9 @@ async function main() {
             update: { position },
           });
           recordCount++;
-        } catch { /* skip dup */ }
+        } catch {
+          /* skip dup */
+        }
       }
 
       // update counts
@@ -149,15 +158,20 @@ async function main() {
         const voteDbId = voteIdMap.get(odataId);
         if (!voteDbId) continue;
         const result =
-          counts.yes > counts.no ? "passed"
-          : counts.no > counts.yes ? "rejected"
-          : "unknown";
+          counts.yes > counts.no ? "passed" : counts.no > counts.yes ? "rejected" : "unknown";
         try {
           await db.vote.update({
             where: { id: voteDbId },
-            data: { yes_count: counts.yes, no_count: counts.no, abstain_count: counts.abstain, result },
+            data: {
+              yes_count: counts.yes,
+              no_count: counts.no,
+              abstain_count: counts.abstain,
+              result,
+            },
           });
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
     } catch (err) {
       console.warn(`  batch ${batchNum} error: ${err}`);

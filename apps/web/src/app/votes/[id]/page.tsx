@@ -33,24 +33,26 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 function VoteResultBadge({ result }: { result: string | null }) {
   if (!result || result === "unknown") {
-    return <span className="badge bg-neutral-100 text-neutral-600 text-base px-3 py-1">לא ידוע</span>;
+    return (
+      <span className="badge bg-neutral-100 px-3 py-1 text-base text-neutral-600">לא ידוע</span>
+    );
   }
   if (result === "passed") {
-    return <span className="badge badge-passed text-base px-3 py-1">עבר ✓</span>;
+    return <span className="badge badge-passed px-3 py-1 text-base">עבר ✓</span>;
   }
-  return <span className="badge badge-rejected text-base px-3 py-1">נדחה ✗</span>;
+  return <span className="badge badge-rejected px-3 py-1 text-base">נדחה ✗</span>;
 }
 
 function PositionBadge({ position }: { position: string }) {
   switch (position) {
     case "yes":
-      return <span className="badge bg-green-100 text-green-700 text-xs">בעד</span>;
+      return <span className="badge bg-green-100 text-xs text-green-700">בעד</span>;
     case "no":
-      return <span className="badge bg-red-100 text-red-700 text-xs">נגד</span>;
+      return <span className="badge bg-red-100 text-xs text-red-700">נגד</span>;
     case "abstain":
-      return <span className="badge bg-neutral-100 text-neutral-600 text-xs">נמנע</span>;
+      return <span className="badge bg-neutral-100 text-xs text-neutral-600">נמנע</span>;
     default:
-      return <span className="badge bg-neutral-50 text-neutral-400 text-xs">לא הצביע</span>;
+      return <span className="badge bg-neutral-50 text-xs text-neutral-400">לא הצביע</span>;
   }
 }
 
@@ -106,7 +108,9 @@ function groupByPosition(records: VoteRecord[]) {
     yes: records.filter((r) => r.position === "yes"),
     no: records.filter((r) => r.position === "no"),
     abstain: records.filter((r) => r.position === "abstain"),
-    other: records.filter((r) => r.position !== "yes" && r.position !== "no" && r.position !== "abstain"),
+    other: records.filter(
+      (r) => r.position !== "yes" && r.position !== "no" && r.position !== "abstain",
+    ),
   };
 }
 
@@ -123,7 +127,7 @@ export default async function VotePage({ params }: { params: { id: string } }) {
       {/* Back */}
       <Link
         href="/votes"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-brand-700"
+        className="hover:text-brand-700 mb-6 inline-flex items-center gap-1 text-sm text-neutral-500"
       >
         ← חזרה לרשימת הצבעות
       </Link>
@@ -131,7 +135,7 @@ export default async function VotePage({ params }: { params: { id: string } }) {
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <h1 className="text-2xl font-bold text-neutral-900 flex-1">{vote.title_he}</h1>
+          <h1 className="flex-1 text-2xl font-bold text-neutral-900">{vote.title_he}</h1>
           <VoteResultBadge result={vote.result} />
         </div>
 
@@ -146,7 +150,7 @@ export default async function VotePage({ params }: { params: { id: string } }) {
             href={vote.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-1 text-sm text-brand-600 hover:underline"
+            className="text-brand-600 mt-3 inline-flex items-center gap-1 text-sm hover:underline"
           >
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
             צפה במקור
@@ -156,7 +160,7 @@ export default async function VotePage({ params }: { params: { id: string } }) {
 
       {/* Vote counts bar */}
       {(vote.yes_count != null || vote.no_count != null) && (
-        <section className="mb-8 card p-5" aria-labelledby="counts-heading">
+        <section className="card mb-8 p-5" aria-labelledby="counts-heading">
           <h2 id="counts-heading" className="mb-3 text-lg font-semibold text-neutral-900">
             תוצאת ההצבעה
           </h2>
@@ -179,7 +183,10 @@ export default async function VotePage({ params }: { params: { id: string } }) {
             {grouped.yes.length > 0 && (
               <div>
                 <h3 className="mb-2 flex items-center gap-2 font-medium text-green-700">
-                  <span className="inline-block h-3 w-3 rounded-full bg-green-500" aria-hidden="true" />
+                  <span
+                    className="inline-block h-3 w-3 rounded-full bg-green-500"
+                    aria-hidden="true"
+                  />
                   בעד — {grouped.yes.length} ח"כים
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -201,7 +208,10 @@ export default async function VotePage({ params }: { params: { id: string } }) {
             {grouped.no.length > 0 && (
               <div>
                 <h3 className="mb-2 flex items-center gap-2 font-medium text-red-700">
-                  <span className="inline-block h-3 w-3 rounded-full bg-red-500" aria-hidden="true" />
+                  <span
+                    className="inline-block h-3 w-3 rounded-full bg-red-500"
+                    aria-hidden="true"
+                  />
                   נגד — {grouped.no.length} ח"כים
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -223,7 +233,10 @@ export default async function VotePage({ params }: { params: { id: string } }) {
             {grouped.abstain.length > 0 && (
               <div>
                 <h3 className="mb-2 flex items-center gap-2 font-medium text-neutral-600">
-                  <span className="inline-block h-3 w-3 rounded-full bg-neutral-400" aria-hidden="true" />
+                  <span
+                    className="inline-block h-3 w-3 rounded-full bg-neutral-400"
+                    aria-hidden="true"
+                  />
                   נמנע — {grouped.abstain.length} ח"כים
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -245,7 +258,10 @@ export default async function VotePage({ params }: { params: { id: string } }) {
             {grouped.other.length > 0 && (
               <div>
                 <h3 className="mb-2 flex items-center gap-2 text-sm font-medium text-neutral-400">
-                  <span className="inline-block h-3 w-3 rounded-full bg-neutral-200" aria-hidden="true" />
+                  <span
+                    className="inline-block h-3 w-3 rounded-full bg-neutral-200"
+                    aria-hidden="true"
+                  />
                   לא הצביע/ה — {grouped.other.length} ח"כים
                 </h3>
                 <div className="flex flex-wrap gap-2">

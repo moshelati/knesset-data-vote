@@ -1,6 +1,6 @@
 import { db } from "@knesset-vote/db";
 import type { MK, MKDetail } from "@knesset-vote/shared";
-import { BILL_TOPIC_LABELS } from "@knesset-vote/shared";
+import { BILL_TOPIC_LABELS_HE } from "@knesset-vote/shared";
 
 async function getSourceLinks(entityType: string, entityId: string) {
   return db.sourceLink.findMany({
@@ -145,18 +145,25 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
 
   const currentMembership = mk.memberships.find((m) => m.is_current);
 
-  const [mkSources, membershipSources, billsInitiated, billsCosponsored, billsPassed, voteCount, topicRows] =
-    await Promise.all([
-      getSourceLinks("mk", mk.id),
-      // Fetch source links for all memberships in parallel
-      Promise.all(mk.memberships.map((m) => getSourceLinks("mk_membership", m.id))),
-      db.mKBillRole.count({ where: { mk_id: mk.id, role: "initiator" } }),
-      db.mKBillRole.count({ where: { mk_id: mk.id, role: "cosponsor" } }),
-      db.mKBillRole.count({
-        where: { mk_id: mk.id, role: "initiator", bill: { status: "passed" } },
-      }),
-      db.voteRecord.count({ where: { mk_id: mk.id } }),
-      db.$queryRaw<{ topic: string; bill_count: bigint; bills_passed: bigint }[]>`
+  const [
+    mkSources,
+    membershipSources,
+    billsInitiated,
+    billsCosponsored,
+    billsPassed,
+    voteCount,
+    topicRows,
+  ] = await Promise.all([
+    getSourceLinks("mk", mk.id),
+    // Fetch source links for all memberships in parallel
+    Promise.all(mk.memberships.map((m) => getSourceLinks("mk_membership", m.id))),
+    db.mKBillRole.count({ where: { mk_id: mk.id, role: "initiator" } }),
+    db.mKBillRole.count({ where: { mk_id: mk.id, role: "cosponsor" } }),
+    db.mKBillRole.count({
+      where: { mk_id: mk.id, role: "initiator", bill: { status: "passed" } },
+    }),
+    db.voteRecord.count({ where: { mk_id: mk.id } }),
+    db.$queryRaw<{ topic: string; bill_count: bigint; bills_passed: bigint }[]>`
         SELECT
           b.topic,
           COUNT(DISTINCT b.id)::int    AS bill_count,
@@ -170,7 +177,7 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
         ORDER BY bill_count DESC
         LIMIT 10
       `,
-    ]);
+  ]);
 
   const lastSyncAt = await db.eTLRun.findFirst({
     where: { status: "completed" },
@@ -180,11 +187,7 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
 
   // Compute profile fields
   const knessetTerms = [
-    ...new Set(
-      mk.memberships
-        .map((m) => m.knesset_number)
-        .filter((n): n is number => n !== null),
-    ),
+    ...new Set(mk.memberships.map((m) => m.knesset_number).filter((n): n is number => n !== null)),
   ].sort((a, b) => a - b);
 
   const firstElected = mk.memberships.reduce<Date | null>((min, m) => {
@@ -203,7 +206,7 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
   // Map topic breakdown rows
   const topicBreakdown = topicRows.map((row) => ({
     topic: row.topic,
-    label_he: BILL_TOPIC_LABELS[row.topic] ?? row.topic,
+    label_he: BILL_TOPIC_LABELS_HE[row.topic] ?? row.topic,
     bill_count: Number(row.bill_count),
     bills_passed: Number(row.bills_passed),
   }));

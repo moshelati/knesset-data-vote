@@ -100,7 +100,10 @@ async function build() {
         { name: "Search", description: "Unified search" },
         { name: "Votes", description: "Parliamentary votes and MK vote records" },
         { name: "Statements", description: "Statements and commitments tracker" },
-        { name: "Recommendations", description: "My Election — personalized party recommendations" },
+        {
+          name: "Recommendations",
+          description: "My Election — personalized party recommendations",
+        },
       ],
     },
   });
@@ -122,10 +125,7 @@ async function build() {
     const statusCode = error.statusCode ?? 500;
     reply.code(statusCode).send({
       error: error.name ?? "Internal Server Error",
-      message:
-        statusCode === 500
-          ? "An unexpected error occurred"
-          : error.message,
+      message: statusCode === 500 ? "An unexpected error occurred" : error.message,
       statusCode,
       requestId: request.id,
     });

@@ -183,8 +183,7 @@ function computePersonalScore(
 
   const score = totalWeight > 0 ? (weightedSum / totalWeight) * 100 : 0;
 
-  const coverageRatio =
-    scoringTopics.length > 0 ? topicsWithData / scoringTopics.length : 0;
+  const coverageRatio = scoringTopics.length > 0 ? topicsWithData / scoringTopics.length : 0;
   const confidence: "high" | "medium" | "low" =
     coverageRatio >= 0.75 ? "high" : coverageRatio >= 0.4 ? "medium" : "low";
 
@@ -233,9 +232,7 @@ async function getHighlights(
 
   // Sort by bill points descending
   const sorted = billRoles.sort(
-    (a, b) =>
-      (BILL_STATUS_SCORE[b.bill.status] ?? 0) -
-      (BILL_STATUS_SCORE[a.bill.status] ?? 0),
+    (a, b) => (BILL_STATUS_SCORE[b.bill.status] ?? 0) - (BILL_STATUS_SCORE[a.bill.status] ?? 0),
   );
 
   // Fetch source links for each candidate bill, keep only those with ≥1 source (guardrail 3)
@@ -286,9 +283,7 @@ export async function getRecommendations(
     }))
     .filter(({ def }) => def && !def.uiOnly && def.topic_keys.length > 0);
 
-  const allTopicKeys = [
-    ...new Set(topicDefs.flatMap(({ def }) => [...def!.topic_keys])),
-  ];
+  const allTopicKeys = [...new Set(topicDefs.flatMap(({ def }) => [...def!.topic_keys]))];
 
   if (allTopicKeys.length === 0) {
     // All selected topics are uiOnly — nothing to score
@@ -393,8 +388,7 @@ export async function getRecommendations(
   );
 
   // 9. Optional free-text suggestions
-  const freeTextSuggestions =
-    req.free_text ? mapFreeText(req.free_text) : undefined;
+  const freeTextSuggestions = req.free_text ? mapFreeText(req.free_text) : undefined;
 
   // 10. Get data_as_of from last ETL run
   const lastSync = await db.eTLRun.findFirst({

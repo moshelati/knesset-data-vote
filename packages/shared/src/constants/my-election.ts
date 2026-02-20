@@ -108,7 +108,7 @@ export const FREE_TEXT_KEYWORD_MAP: Array<{
   topic_id: MyElectionTopicId;
 }> = [
   {
-    keywords: ['דיור', 'שכירות', 'דירה', 'משכנתה', 'נדל"ן'],
+    keywords: ["דיור", "שכירות", "דירה", "משכנתה", 'נדל"ן'],
     topic_id: "housing_prices",
   },
   {
@@ -140,7 +140,7 @@ export const FREE_TEXT_KEYWORD_MAP: Array<{
     topic_id: "religion_state",
   },
   {
-    keywords: ['שלטון חוק', 'רפורמה משפטית', 'בג"ץ', "שופטים", "מינויים"],
+    keywords: ["שלטון חוק", "רפורמה משפטית", 'בג"ץ', "שופטים", "מינויים"],
     topic_id: "rule_of_law",
   },
   {

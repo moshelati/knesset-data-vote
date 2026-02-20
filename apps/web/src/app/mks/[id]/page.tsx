@@ -9,6 +9,9 @@ import { MetricCard } from "@/components/shared/MetricCard";
 import { BillStatusBadge } from "@/components/shared/BillStatusBadge";
 import { OfficialLinksCard } from "@/components/shared/OfficialLinksCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { TopicBreakdownChart } from "@/components/mk/TopicBreakdownChart";
+import { CommitteeList } from "@/components/mk/CommitteeList";
+import { AgendaCard } from "@/components/mk/AgendaCard";
 import { formatDate, formatDateShort } from "@/lib/utils";
 import type { MKDetail } from "@knesset-vote/shared";
 
@@ -31,7 +34,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   if (!mk) return { title: "חבר כנסת לא נמצא" };
   return {
     title: mk.name_he,
-    description: `פרופיל ${mk.name_he} — ${mk.current_party_name ?? "ח\"כ"}`,
+    description: `פרופיל ${mk.name_he} — ${mk.current_party_name ?? 'ח"כ'}`,
   };
 }
 
@@ -58,7 +61,7 @@ export default async function MKPage({ params }: { params: { id: string } }) {
         <div className="flex items-start gap-6">
           {/* Avatar */}
           <div
-            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-brand-100 text-2xl font-bold text-brand-700"
+            className="bg-brand-100 text-brand-700 flex h-20 w-20 shrink-0 items-center justify-center rounded-full text-2xl font-bold"
             aria-hidden="true"
           >
             {mk.name_he.charAt(0)}
@@ -67,17 +70,27 @@ export default async function MKPage({ params }: { params: { id: string } }) {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-neutral-900">{mk.name_he}</h1>
-                {mk.name_en && (
-                  <p className="text-neutral-500">{mk.name_en}</p>
+                {mk.name_en && <p className="text-neutral-500">{mk.name_en}</p>}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {mk.is_current ? (
+                  <span className="badge bg-green-100 px-3 py-1 text-green-800">
+                    חבר/ת כנסת פעיל/ה
+                  </span>
+                ) : (
+                  <span className="badge-unknown badge px-3 py-1">לשעבר</span>
+                )}
+                {mk.profile?.gender && mk.profile.gender !== "unknown" && (
+                  <span className="badge bg-neutral-100 px-2 py-1 text-neutral-600">
+                    {mk.profile.gender_label_he}
+                  </span>
+                )}
+                {mk.profile?.knesset_terms && mk.profile.knesset_terms.length > 0 && (
+                  <span className="badge bg-brand-50 text-brand-700 px-2 py-1">
+                    {mk.profile.knesset_terms.length} כנסות
+                  </span>
                 )}
               </div>
-              {mk.is_current ? (
-                <span className="badge bg-green-100 text-green-800 px-3 py-1">
-                  חבר/ת כנסת פעיל/ה
-                </span>
-              ) : (
-                <span className="badge-unknown badge px-3 py-1">לשעבר</span>
-              )}
             </div>
 
             {mk.current_party_name && (
@@ -86,7 +99,7 @@ export default async function MKPage({ params }: { params: { id: string } }) {
                 {mk.current_party_id ? (
                   <Link
                     href={`/parties/${mk.current_party_id}`}
-                    className="font-medium text-brand-600 hover:underline"
+                    className="text-brand-600 font-medium hover:underline"
                   >
                     {mk.current_party_name}
                   </Link>
@@ -100,10 +113,7 @@ export default async function MKPage({ params }: { params: { id: string } }) {
               <SourceBadge sources={mk.sources} />
             </div>
             <div className="mt-4">
-              <OfficialLinksCard
-                entityType="mk"
-                externalId={mk.external_id}
-              />
+              <OfficialLinksCard entityType="mk" externalId={mk.external_id} />
             </div>
           </div>
         </div>
@@ -143,7 +153,7 @@ export default async function MKPage({ params }: { params: { id: string } }) {
           <MetricCard
             label="חברויות בוועדות"
             value={metrics.committee_memberships}
-            tooltip="חברויות פעילות בוועדות כנסת — לפי Knesset OData"
+            tooltip="מספר ועדות כנסת שבהן חבר/ת הכנסת רשומ/ה — לפי Knesset OData"
             confidence={metrics.committee_memberships !== null ? "high" : "unavailable"}
           />
           <MetricCard
@@ -195,17 +205,13 @@ export default async function MKPage({ params }: { params: { id: string } }) {
                     <td className="px-4 py-3">
                       <Link
                         href={`/parties/${m.party_id}`}
-                        className="font-medium text-brand-600 hover:underline"
+                        className="text-brand-600 font-medium hover:underline"
                       >
                         {m.party_name_he}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-neutral-500">
-                      {m.knesset_number ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-neutral-500">
-                      {formatDateShort(m.start_date)}
-                    </td>
+                    <td className="px-4 py-3 text-neutral-500">{m.knesset_number ?? "—"}</td>
+                    <td className="px-4 py-3 text-neutral-500">{formatDateShort(m.start_date)}</td>
                     <td className="px-4 py-3 text-neutral-500">
                       {m.is_current ? "עד היום" : formatDateShort(m.end_date)}
                     </td>
@@ -230,6 +236,49 @@ export default async function MKPage({ params }: { params: { id: string } }) {
         </section>
       )}
 
+      {/* Profile & agenda card */}
+      {mk.profile && (
+        <section className="mb-8" aria-labelledby="agenda-heading">
+          <h2 id="agenda-heading" className="mb-4 text-xl font-semibold text-neutral-900">
+            פרופיל וניסיון
+          </h2>
+          <AgendaCard
+            profile={mk.profile}
+            topTopics={mk.topic_breakdown ?? []}
+            name_he={mk.name_he}
+            is_current={mk.is_current}
+          />
+        </section>
+      )}
+
+      {/* Topic breakdown */}
+      {mk.topic_breakdown && mk.topic_breakdown.length > 0 && (
+        <section className="mb-8" aria-labelledby="topics-heading">
+          <h2 id="topics-heading" className="mb-4 text-xl font-semibold text-neutral-900">
+            נושאי חקיקה
+          </h2>
+          <div className="card p-5">
+            <TopicBreakdownChart topics={mk.topic_breakdown} />
+          </div>
+        </section>
+      )}
+
+      {/* Committee list */}
+      {mk.committee_list && mk.committee_list.length > 0 && (
+        <section className="mb-8" aria-labelledby="committees-heading">
+          <h2 id="committees-heading" className="mb-4 text-xl font-semibold text-neutral-900">
+            ועדות כנסת
+          </h2>
+          <CommitteeList committees={mk.committee_list} />
+          <p className="mt-2 text-xs text-neutral-400">
+            מקור: Knesset OData • ראו{" "}
+            <a href="/methodology" className="hover:text-brand-700 underline">
+              מתודולוגיה
+            </a>
+          </p>
+        </section>
+      )}
+
       {/* Recent bills */}
       {mk.recent_bills.length > 0 && (
         <section aria-labelledby="bills-heading">
@@ -245,7 +294,7 @@ export default async function MKPage({ params }: { params: { id: string } }) {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <p className="font-medium text-neutral-900 group-hover:text-brand-700">
+                    <p className="group-hover:text-brand-700 font-medium text-neutral-900">
                       {bill.title_he}
                     </p>
                     {bill.title_en && (
@@ -278,10 +327,7 @@ export default async function MKPage({ params }: { params: { id: string } }) {
             ))}
           </div>
           <div className="mt-4">
-            <Link
-              href={`/bills?mk_id=${mk.id}`}
-              className="text-sm text-brand-600 hover:underline"
-            >
+            <Link href={`/bills?mk_id=${mk.id}`} className="text-brand-600 text-sm hover:underline">
               הצג את כל הצעות החוק →
             </Link>
           </div>

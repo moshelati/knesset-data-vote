@@ -72,18 +72,16 @@ export function WizardClient() {
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({})) as Record<string, unknown>;
+        const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
         if (res.status === 503) {
-          setError(
-            "נתוני ההמלצות עדיין לא מוכנים. אנא נסה שוב מאוחר יותר.",
-          );
+          setError("נתוני ההמלצות עדיין לא מוכנים. אנא נסה שוב מאוחר יותר.");
         } else {
           setError((body.message as string) ?? `שגיאה ${res.status}`);
         }
         return;
       }
 
-      const data = await res.json() as RecommendationResponse;
+      const data = (await res.json()) as RecommendationResponse;
       setResults(data);
       setStep("results");
     } catch {
@@ -129,16 +127,13 @@ export function WizardClient() {
             aria-label={`שלב ${stepNum} מתוך 3`}
           >
             <div
-              className="h-full rounded-full bg-brand-700 transition-all duration-300"
+              className="bg-brand-700 h-full rounded-full transition-all duration-300"
               style={{ width: `${progressPct}%` }}
             />
           </div>
           <div className="mt-2 flex justify-between text-xs text-neutral-500">
             {([1, 2, 3] as const).map((s) => (
-              <span
-                key={s}
-                className={step === s ? "font-semibold text-brand-700" : ""}
-              >
+              <span key={s} className={step === s ? "text-brand-700 font-semibold" : ""}>
                 שלב {s}: {STEP_LABELS[s]}
               </span>
             ))}
@@ -149,9 +144,7 @@ export function WizardClient() {
       {/* ── Step 1: Topic selection ── */}
       {step === 1 && (
         <div>
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
-            אילו נושאים חשובים לך?
-          </h2>
+          <h2 className="mb-2 text-xl font-semibold text-neutral-900">אילו נושאים חשובים לך?</h2>
           <p className="mb-5 text-sm text-neutral-500">
             בחר לפחות נושא אחד. ניתן לבחור עד 10 נושאים.
           </p>
@@ -183,17 +176,13 @@ export function WizardClient() {
       {/* ── Step 2: Weight sliders ── */}
       {step === 2 && (
         <div>
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
-            כמה חשוב לך כל נושא?
-          </h2>
+          <h2 className="mb-2 text-xl font-semibold text-neutral-900">כמה חשוב לך כל נושא?</h2>
           <p className="mb-5 text-sm text-neutral-500">
             קבע את החשיבות היחסית של כל נושא (1 = מעט, 5 = קריטי)
           </p>
 
           {selectedTopicIds.size === 0 ? (
-            <p className="text-sm text-neutral-500">
-              לא נבחרו נושאים. חזור לשלב הקודם.
-            </p>
+            <p className="text-sm text-neutral-500">לא נבחרו נושאים. חזור לשלב הקודם.</p>
           ) : (
             <div className="space-y-5">
               {Array.from(selectedTopicIds).map((id) => {
@@ -213,11 +202,7 @@ export function WizardClient() {
           )}
 
           <div className="mt-6 flex justify-between">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="btn-secondary"
-            >
+            <button type="button" onClick={() => setStep(1)} className="btn-secondary">
               ← חזור
             </button>
             <button
@@ -235,9 +220,7 @@ export function WizardClient() {
       {/* ── Step 3: Free text ── */}
       {step === 3 && (
         <div>
-          <h2 className="mb-2 text-xl font-semibold text-neutral-900">
-            יש עוד משהו שחשוב לך?
-          </h2>
+          <h2 className="mb-2 text-xl font-semibold text-neutral-900">יש עוד משהו שחשוב לך?</h2>
           <p className="mb-5 text-sm text-neutral-500">
             כתוב בחופשיות — המערכת תזהה מילות מפתח ותציע נושאים נוספים.
           </p>
@@ -292,14 +275,8 @@ export function WizardClient() {
       {step === "results" && results && (
         <div>
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-neutral-900">
-              הסיעות המובילות עבורך
-            </h2>
-            <button
-              type="button"
-              onClick={handleRestart}
-              className="btn-secondary text-sm"
-            >
+            <h2 className="text-xl font-semibold text-neutral-900">הסיעות המובילות עבורך</h2>
+            <button type="button" onClick={handleRestart} className="btn-secondary text-sm">
               ← התחל מחדש
             </button>
           </div>
@@ -317,15 +294,13 @@ export function WizardClient() {
 
           {/* Free text suggestions */}
           {results.free_text_suggestions && results.free_text_suggestions.length > 0 && (
-            <div className="mt-6 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm">
-              <p className="font-medium text-brand-800 mb-2">
-                נושאים נוספים שזיהינו בטקסט שלך:
-              </p>
-              <ul className="space-y-1 text-brand-700">
+            <div className="border-brand-200 bg-brand-50 mt-6 rounded-lg border p-4 text-sm">
+              <p className="text-brand-800 mb-2 font-medium">נושאים נוספים שזיהינו בטקסט שלך:</p>
+              <ul className="text-brand-700 space-y-1">
                 {results.free_text_suggestions.map((s) => (
                   <li key={s.suggested_topic_id}>
-                    <span className="font-medium">{s.label_he}</span>
-                    {" "}(מילת מפתח: {s.matched_keyword})
+                    <span className="font-medium">{s.label_he}</span> (מילת מפתח:{" "}
+                    {s.matched_keyword})
                   </li>
                 ))}
               </ul>
@@ -334,13 +309,10 @@ export function WizardClient() {
 
           {/* Methodology link */}
           <div className="mt-6 text-center text-sm text-neutral-500">
-            <a
-              href="/methodology#my-election-scoring"
-              className="text-brand-600 hover:underline"
-            >
+            <a href="/methodology#my-election-scoring" className="text-brand-600 hover:underline">
               כיצד מחושב הציון? ←
-            </a>
-            {" "}•{" "}
+            </a>{" "}
+            •{" "}
             <span>
               נתונים נכון ל:{" "}
               {results.meta.data_as_of

@@ -24,7 +24,14 @@ export async function billRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async (request, reply) => {
-      const { search, topic, status, mk_id, page = 1, limit = 20 } = request.query as {
+      const {
+        search,
+        topic,
+        status,
+        mk_id,
+        page = 1,
+        limit = 20,
+      } = request.query as {
         search?: string;
         topic?: string;
         status?: string;

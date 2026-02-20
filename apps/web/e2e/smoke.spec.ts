@@ -108,12 +108,8 @@ test.describe("Methodology page", () => {
 
   test("shows neutral language principles", async ({ page }) => {
     await page.goto(`${BASE_URL}/methodology`);
-    await expect(
-      page.getByText("Matched parliamentary activity found"),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Not available from source"),
-    ).toBeVisible();
+    await expect(page.getByText("Matched parliamentary activity found")).toBeVisible();
+    await expect(page.getByText("Not available from source")).toBeVisible();
   });
 
   test("has table of contents with working anchors", async ({ page }) => {

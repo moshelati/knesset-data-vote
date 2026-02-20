@@ -5,8 +5,7 @@ import type { MetaResponse } from "@knesset-vote/shared";
 
 export const metadata: Metadata = {
   title: "מתודולוגיה ומגבלות",
-  description:
-    "הסבר מלא על שיטת החישוב, מקורות הנתונים, ומגבלות הפלטפורמה",
+  description: "הסבר מלא על שיטת החישוב, מקורות הנתונים, ומגבלות הפלטפורמה",
 };
 
 async function getMeta(): Promise<MetaResponse | null> {
@@ -33,12 +32,9 @@ export default async function MethodologyPage() {
       </p>
 
       {/* Table of contents */}
-      <nav
-        className="card mb-10 p-5"
-        aria-label="תוכן עניינים"
-      >
+      <nav className="card mb-10 p-5" aria-label="תוכן עניינים">
         <h2 className="mb-3 font-semibold text-neutral-900">תוכן עניינים</h2>
-        <ul className="space-y-1 text-sm text-brand-600">
+        <ul className="text-brand-600 space-y-1 text-sm">
           {[
             { href: "#overview", label: "סקירה כללית" },
             { href: "#principles", label: "עקרונות יסוד" },
@@ -69,10 +65,10 @@ export default async function MethodologyPage() {
           <h2 id="overview-heading" className="text-2xl font-bold text-neutral-900">
             סקירה כללית
           </h2>
-          <p className="mt-3 text-neutral-700 leading-relaxed">
+          <p className="mt-3 leading-relaxed text-neutral-700">
             Knesset Vote הינה פלטפורמה ציבורית לניתוח נתוני כנסת ישראל. המטרה: לאפשר לבוחרים,
-            עיתונאים, וחוקרים לבחון את פעילות חברי הכנסת והסיעות על בסיס נתונים פרלמנטריים מאומתים
-            — ללא טענות שלא ניתן לאמת.
+            עיתונאים, וחוקרים לבחון את פעילות חברי הכנסת והסיעות על בסיס נתונים פרלמנטריים מאומתים —
+            ללא טענות שלא ניתן לאמת.
           </p>
         </section>
 
@@ -82,48 +78,54 @@ export default async function MethodologyPage() {
             עקרונות יסוד
           </h2>
           <div className="mt-4 space-y-4">
-            <div className="card border-r-4 border-brand-500 p-4">
+            <div className="card border-brand-500 border-r-4 p-4">
               <h3 className="font-semibold text-neutral-900">1. ללא המצאה</h3>
               <p className="mt-1 text-sm text-neutral-700">
-                אנו לא מציגים שום טענה שאינה מגובה במקור נתונים רשמי. אם מידע חסר, יוצג
-                "לא זמין ממקור" בלבד — לא ניחוש, לא השלמה אוטומטית.
+                אנו לא מציגים שום טענה שאינה מגובה במקור נתונים רשמי. אם מידע חסר, יוצג "לא זמין
+                ממקור" בלבד — לא ניחוש, לא השלמה אוטומטית.
               </p>
             </div>
-            <div className="card border-r-4 border-brand-500 p-4">
+            <div className="card border-brand-500 border-r-4 p-4">
               <h3 className="font-semibold text-neutral-900">2. קישור מלא למקור</h3>
               <p className="mt-1 text-sm text-neutral-700">
-                כל מדד, רשימה, ופריט נתון מקושר לרשומה המקורית ב-Knesset OData API עם מזהה
-                חיצוני ו-URL ניתן לאימות.
+                כל מדד, רשימה, ופריט נתון מקושר לרשומה המקורית ב-Knesset OData API עם מזהה חיצוני
+                ו-URL ניתן לאימות.
               </p>
             </div>
-            <div className="card border-r-4 border-brand-500 p-4">
+            <div className="card border-brand-500 border-r-4 p-4">
               <h3 className="font-semibold text-neutral-900">3. שפה ניטרלית</h3>
-              <p className="mt-1 text-sm text-neutral-700">
-                אנו משתמשים אך ורק בניסוחים ניטרליים:
-              </p>
+              <p className="mt-1 text-sm text-neutral-700">אנו משתמשים אך ורק בניסוחים ניטרליים:</p>
               <ul className="mt-2 space-y-1 text-sm text-neutral-700">
                 <li>
-                  <code className="rounded bg-neutral-100 px-1">"Matched parliamentary activity found"</code> — כשיש התאמה
+                  <code className="rounded bg-neutral-100 px-1">
+                    "Matched parliamentary activity found"
+                  </code>{" "}
+                  — כשיש התאמה
                 </li>
                 <li>
-                  <code className="rounded bg-neutral-100 px-1">"Partial match"</code> — כשיש התאמה חלקית
+                  <code className="rounded bg-neutral-100 px-1">"Partial match"</code> — כשיש התאמה
+                  חלקית
                 </li>
                 <li>
-                  <code className="rounded bg-neutral-100 px-1">"No matching parliamentary activity found as of [date]"</code> — כשאין התאמה
+                  <code className="rounded bg-neutral-100 px-1">
+                    "No matching parliamentary activity found as of [date]"
+                  </code>{" "}
+                  — כשאין התאמה
                 </li>
                 <li>
-                  <code className="rounded bg-neutral-100 px-1">"Not available from source"</code> — כשמידע חסר
+                  <code className="rounded bg-neutral-100 px-1">"Not available from source"</code> —
+                  כשמידע חסר
                 </li>
               </ul>
               <p className="mt-2 text-sm font-medium text-red-700">
                 אסורים: "נכשל", "שקר", "שחיתות", "ניאש", "לא קיים את הבטחתו"
               </p>
             </div>
-            <div className="card border-r-4 border-brand-500 p-4">
+            <div className="card border-brand-500 border-r-4 p-4">
               <h3 className="font-semibold text-neutral-900">4. ניטרליות פוליטית</h3>
               <p className="mt-1 text-sm text-neutral-700">
-                אין תיוג &quot;ימין/שמאל/מרכז&quot;. אין מתן ציון אידיאולוגי. הנתונים מוצגים
-                כפי שהם מהמקור.
+                אין תיוג &quot;ימין/שמאל/מרכז&quot;. אין מתן ציון אידיאולוגי. הנתונים מוצגים כפי שהם
+                מהמקור.
               </p>
             </div>
           </div>
@@ -153,8 +155,8 @@ export default async function MethodologyPage() {
                 </a>
               </p>
               <p className="mt-2 text-sm text-neutral-700">
-                מקור הנתונים הרשמי של הכנסת. גלויה את כל הישויות הזמינות דרך מסמך ה-$metadata.
-                הגישה נעשית דרך OData v3 עם ספר-אינות ($top/$skip/nextLink).
+                מקור הנתונים הרשמי של הכנסת. גלויה את כל הישויות הזמינות דרך מסמך ה-$metadata. הגישה
+                נעשית דרך OData v3 עם ספר-אינות ($top/$skip/nextLink).
               </p>
               {meta?.data_sources[0]?.entity_sets_discovered &&
                 meta.data_sources[0].entity_sets_discovered.length > 0 && (
@@ -181,18 +183,18 @@ export default async function MethodologyPage() {
           <h2 id="parties-heading" className="text-2xl font-bold text-neutral-900">
             נתוני סיעות
           </h2>
-          <div className="mt-4 card p-5 space-y-3 text-sm text-neutral-700">
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
             <div>
-              <strong>מנדטים:</strong> מספר מנדטים כפי שמדווח בישות Faction ב-OData.
-              אם שדה CountOfMembers חסר — יוצג "לא זמין ממקור".
+              <strong>מנדטים:</strong> מספר מנדטים כפי שמדווח בישות Faction ב-OData. אם שדה
+              CountOfMembers חסר — יוצג "לא זמין ממקור".
             </div>
             <div>
               <strong>הצעות חוק שהוגשו:</strong> ספירה של כל רשומות MKBillRole שבהן role=initiator
               עבור חברי הסיעה הנוכחיים.
             </div>
             <div>
-              <strong>חוקים שעברו:</strong> סינון על הצעות חוק עם status=passed.
-              מגבלה: נתוני מצב חוק עשויים להיות חלקיים בכנסות קודמות.
+              <strong>חוקים שעברו:</strong> סינון על הצעות חוק עם status=passed. מגבלה: נתוני מצב
+              חוק עשויים להיות חלקיים בכנסות קודמות.
             </div>
           </div>
         </section>
@@ -202,9 +204,10 @@ export default async function MethodologyPage() {
           <h2 id="mks-heading" className="text-2xl font-bold text-neutral-900">
             נתוני חברי כנסת
           </h2>
-          <div className="mt-4 card p-5 space-y-3 text-sm text-neutral-700">
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
             <div>
-              <strong>הצעות חוק:</strong> ספירה לפי רשומות BillInitiator ב-OData עם IsInitiator=true.
+              <strong>הצעות חוק:</strong> ספירה לפי רשומות BillInitiator ב-OData עם
+              IsInitiator=true.
             </div>
             <div>
               <strong>שותפות להגשה:</strong> ספירה לפי רשומות BillInitiator עם IsInitiator=false.
@@ -226,7 +229,7 @@ export default async function MethodologyPage() {
           <h2 id="bills-heading" className="text-2xl font-bold text-neutral-900">
             נתוני הצעות חוק
           </h2>
-          <div className="mt-4 card p-5 space-y-3 text-sm text-neutral-700">
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
             <div>
               <strong>מצב הצעת חוק:</strong> ממופה מ-StatusID ב-OData לקטגוריות: draft, submitted,
               committee_review, first_reading, second_reading, third_reading, passed, rejected,
@@ -246,12 +249,13 @@ export default async function MethodologyPage() {
           <h2 id="topic-heading" className="text-2xl font-bold text-neutral-900">
             סיווג נושאים
           </h2>
-          <div className="mt-4 card p-5 text-sm text-neutral-700">
+          <div className="card mt-4 p-5 text-sm text-neutral-700">
             <p>
-              <strong>גרסה MVP:</strong> התאמת מילות מפתח סטטיות (ראו packages/shared/src/constants).
-              כל הצעת חוק מסווגת לנושא על פי נוכחות מילות מפתח בשם ובתיאור.
+              <strong>גרסה MVP:</strong> התאמת מילות מפתח סטטיות (ראו
+              packages/shared/src/constants). כל הצעת חוק מסווגת לנושא על פי נוכחות מילות מפתח בשם
+              ובתיאור.
             </p>
-            <p className="mt-2 text-amber-700 font-medium">
+            <p className="mt-2 font-medium text-amber-700">
               ⚠ מגבלה: סיווג זה אוטומטי ועשוי להיות שגוי. הסיווג אינו מחייב.
             </p>
             <p className="mt-2">
@@ -265,18 +269,18 @@ export default async function MethodologyPage() {
           <h2 id="statements-heading" className="text-2xl font-bold text-neutral-900">
             הצהרות ומחויבויות
           </h2>
-          <div className="mt-4 card p-5 text-sm text-neutral-700 space-y-2">
+          <div className="card mt-4 space-y-2 p-5 text-sm text-neutral-700">
             <p>
-              הצהרות ומחויבויות הן ציטוטים ממוקורות ציבוריים (ראיונות, נאומים, מצעים) שהוזנו
-              ידנית בגרסה 1. כל הצהרה חייבת לכלול URL למקור.
+              הצהרות ומחויבויות הן ציטוטים ממוקורות ציבוריים (ראיונות, נאומים, מצעים) שהוזנו ידנית
+              בגרסה 1. כל הצהרה חייבת לכלול URL למקור.
             </p>
             <p>
-              <strong>שפת ניטרלית:</strong> אנו משתמשים במינוח "לא נמצאה פעילות פרלמנטרית
-              תואמת נכון ל-[תאריך]" בלבד. אין שימוש במינוח "הבטחה שנשברה", "כישלון", וכד'.
+              <strong>שפת ניטרלית:</strong> אנו משתמשים במינוח "לא נמצאה פעילות פרלמנטרית תואמת נכון
+              ל-[תאריך]" בלבד. אין שימוש במינוח "הבטחה שנשברה", "כישלון", וכד'.
             </p>
             <p>
-              <strong>קישור לפעילות:</strong> ניתן לקשר הצהרה להצעת חוק ספציפית עם שדה
-              match_type (manual/auto_keyword) ורמת ביטחון.
+              <strong>קישור לפעילות:</strong> ניתן לקשר הצהרה להצעת חוק ספציפית עם שדה match_type
+              (manual/auto_keyword) ורמת ביטחון.
             </p>
           </div>
         </section>
@@ -286,7 +290,7 @@ export default async function MethodologyPage() {
           <h2 id="confidence-heading" className="text-2xl font-bold text-neutral-900">
             רמות ביטחון
           </h2>
-          <div className="mt-4 card p-5 text-sm text-neutral-700">
+          <div className="card mt-4 p-5 text-sm text-neutral-700">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-neutral-200">
@@ -296,19 +300,23 @@ export default async function MethodologyPage() {
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 <tr>
-                  <td className="py-2 text-green-700 font-medium">High confidence</td>
-                  <td className="py-2">קיים קישור מקור ישיר מ-Knesset OData עם external_id ו-URL</td>
+                  <td className="py-2 font-medium text-green-700">High confidence</td>
+                  <td className="py-2">
+                    קיים קישור מקור ישיר מ-Knesset OData עם external_id ו-URL
+                  </td>
                 </tr>
                 <tr>
-                  <td className="py-2 text-yellow-700 font-medium">Medium confidence</td>
-                  <td className="py-2">נתון נגזר (ספירה, חישוב) ממקור ישיר — עשויות להיות שגיאות קטנות</td>
+                  <td className="py-2 font-medium text-yellow-700">Medium confidence</td>
+                  <td className="py-2">
+                    נתון נגזר (ספירה, חישוב) ממקור ישיר — עשויות להיות שגיאות קטנות
+                  </td>
                 </tr>
                 <tr>
-                  <td className="py-2 text-red-600 font-medium">Limited data</td>
+                  <td className="py-2 font-medium text-red-600">Limited data</td>
                   <td className="py-2">נתון קיים אך אין קישור מקור ישיר, או שהנתון אפס</td>
                 </tr>
                 <tr>
-                  <td className="py-2 text-neutral-500 font-medium">Not available from source</td>
+                  <td className="py-2 font-medium text-neutral-500">Not available from source</td>
                   <td className="py-2">השדה חסר לחלוטין מ-OData</td>
                 </tr>
               </tbody>
@@ -321,30 +329,30 @@ export default async function MethodologyPage() {
           <h2 id="limitations-heading" className="text-2xl font-bold text-neutral-900">
             מגבלות ידועות
           </h2>
-          <div className="mt-4 card p-5 text-sm text-neutral-700 space-y-3">
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
             <p>
-              <strong>שלמות נתונים:</strong> ייתכן שישויות OData מסוימות אינן זמינות או שמות
-              שדות שונים מהגרסה שניסינו. הישויות מתגלות דינמית מה-$metadata.
+              <strong>שלמות נתונים:</strong> ייתכן שישויות OData מסוימות אינן זמינות או שמות שדות
+              שונים מהגרסה שניסינו. הישויות מתגלות דינמית מה-$metadata.
             </p>
             <p>
-              <strong>כנסות קודמות:</strong> נתוני חקיקה של כנסות קודמות עשויים להיות חסרים
-              או חלקיים ב-OData.
+              <strong>כנסות קודמות:</strong> נתוני חקיקה של כנסות קודמות עשויים להיות חסרים או
+              חלקיים ב-OData.
             </p>
             <p>
               <strong>הצבעות:</strong> נתוני הצבעות אינדיבידואליות תלויים בזמינות ישות VoteRecord.
               אם אינה קיימת ב-OData, הנתון יוצג כ"לא זמין ממקור".
             </p>
             <p>
-              <strong>תמונות:</strong> תמונות ח"כ אינן זמינות ב-OData ולכן מוצג אווטאר עם
-              האות הראשונה של השם.
+              <strong>תמונות:</strong> תמונות ח"כ אינן זמינות ב-OData ולכן מוצג אווטאר עם האות
+              הראשונה של השם.
             </p>
             <p>
-              <strong>תיאור חוקים:</strong> תיאורי חוקים תלויים בשדה SummaryLaw. חוקים ישנים
-              עשויים להיות ללא תיאור.
+              <strong>תיאור חוקים:</strong> תיאורי חוקים תלויים בשדה SummaryLaw. חוקים ישנים עשויים
+              להיות ללא תיאור.
             </p>
             <p>
-              <strong>זמן אמת:</strong> הנתונים מתעדכנים לפי לוח זמנים של ETL ואינם מידיים.
-              ראו "עדכון אחרון" בכל עמוד.
+              <strong>זמן אמת:</strong> הנתונים מתעדכנים לפי לוח זמנים של ETL ואינם מידיים. ראו
+              "עדכון אחרון" בכל עמוד.
             </p>
           </div>
         </section>
@@ -354,21 +362,21 @@ export default async function MethodologyPage() {
           <h2 id="audit-heading" className="text-2xl font-bold text-neutral-900">
             ביקורתיות ושקיפות
           </h2>
-          <div className="mt-4 card p-5 text-sm text-neutral-700 space-y-3">
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
             <p>
-              <strong>Raw Snapshots:</strong> כל fetch מה-API נשמר כ-RawSnapshot עם hash. ניתן
-              לבקר כל שינוי נתון לאורך זמן.
+              <strong>Raw Snapshots:</strong> כל fetch מה-API נשמר כ-RawSnapshot עם hash. ניתן לבקר
+              כל שינוי נתון לאורך זמן.
             </p>
             <p>
-              <strong>ETL Runs:</strong> כל ריצת ETL נרשמת עם timestamps, ספירות, ושגיאות.
-              ניתן לגשת לסיכום דרך <code className="font-mono">/api/meta</code>.
+              <strong>ETL Runs:</strong> כל ריצת ETL נרשמת עם timestamps, ספירות, ושגיאות. ניתן לגשת
+              לסיכום דרך <code className="font-mono">/api/meta</code>.
             </p>
             <p>
               <strong>קוד פתוח:</strong> הפרויקט פתוח לביקורת. כל לוגיקת חישוב זמינה בקוד.
             </p>
             <p>
-              <strong>אינדקסים:</strong> כל רשומה כוללת external_id ו-external_source לאימות
-              מול המקור הרשמי.
+              <strong>אינדקסים:</strong> כל רשומה כוללת external_id ו-external_source לאימות מול
+              המקור הרשמי.
             </p>
           </div>
         </section>
@@ -378,11 +386,11 @@ export default async function MethodologyPage() {
           <h2 id="my-election-scoring-heading" className="text-2xl font-bold text-neutral-900">
             הבחירות שלי — שיטת חישוב
           </h2>
-          <p className="mt-3 text-neutral-700 leading-relaxed">
+          <p className="mt-3 leading-relaxed text-neutral-700">
             פיצ׳ר "הבחירות שלי" מדרג סיעות על בסיס פעילות חקיקתית בנושאים שבחרת. אין שימוש בתיוג
             פוליטי, בהצהרות, או בנתונים שאינם מרשמי הכנסת.
           </p>
-          <div className="mt-4 card p-5 text-sm text-neutral-700 space-y-3">
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
             <p>
               <strong>ניקוד לפי סטטוס:</strong> passed=5, second/third_reading=3,
               committee_review/first_reading=2, submitted=1, אחר=0.
@@ -403,7 +411,8 @@ export default async function MethodologyPage() {
               <code className="font-mono">Σ(משקל × ציון_נושא) / Σמשקלות × 100</code>.
             </p>
             <p>
-              <strong>ביטחון:</strong> ≥75% מהנושאים עם ≥2 הצ"ח = גבוה; 40–74% = בינוני; {`<`}40% = נמוך.
+              <strong>ביטחון:</strong> ≥75% מהנושאים עם ≥2 הצ"ח = גבוה; 40–74% = בינוני; {`<`}40% =
+              נמוך.
             </p>
           </div>
         </section>
@@ -413,22 +422,22 @@ export default async function MethodologyPage() {
           <h2 id="my-election-limitations-heading" className="text-2xl font-bold text-neutral-900">
             הבחירות שלי — מגבלות
           </h2>
-          <div className="mt-4 card p-5 text-sm text-neutral-700 space-y-3">
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
             <p>
-              <strong>אין תיוג אידאולוגי:</strong> הציונים משקפים פעילות חקיקתית בלבד — לא עמדות,
-              לא ערכים, ולא השתייכות פוליטית. "ימין/שמאל" אינם חלק מהחישוב.
+              <strong>אין תיוג אידאולוגי:</strong> הציונים משקפים פעילות חקיקתית בלבד — לא עמדות, לא
+              ערכים, ולא השתייכות פוליטית. "ימין/שמאל" אינם חלק מהחישוב.
             </p>
             <p>
-              <strong>כיסוי חלקי:</strong> חוקים שאינם מסווגים לנושא ב-OData אינם נכללים.
-              נושאים עם ביטחון נמוך = פחות מ-2 הצ"ח ב-DB.
+              <strong>כיסוי חלקי:</strong> חוקים שאינם מסווגים לנושא ב-OData אינם נכללים. נושאים עם
+              ביטחון נמוך = פחות מ-2 הצ"ח ב-DB.
             </p>
             <p>
               <strong>שגיאות בסיווג:</strong> נושאי הצ"ח מחושבים ממילות מפתח. ייתכן שסיווג מסוים
               שגוי — בדוק תמיד במקורות הרשמיים (קישורים מצורפים לכל הצ"ח).
             </p>
             <p>
-              <strong>חברות נוכחית בלבד:</strong> הציון משקלל רק חברי כנסת שהם כרגע חברים בסיעה.
-              ח"כ שעבר סיעה לא יופיע בשתיהן.
+              <strong>חברות נוכחית בלבד:</strong> הציון משקלל רק חברי כנסת שהם כרגע חברים בסיעה. ח"כ
+              שעבר סיעה לא יופיע בשתיהן.
             </p>
             <p>
               <strong>רעננות הנתונים:</strong> הציונים מחושבים מחדש בכל ריצת{" "}
@@ -440,7 +449,7 @@ export default async function MethodologyPage() {
 
       {/* ETL info */}
       {meta?.etl_summary && (
-        <div className="mt-12 card p-5 text-sm text-neutral-700">
+        <div className="card mt-12 p-5 text-sm text-neutral-700">
           <h2 className="mb-3 font-semibold text-neutral-900">מצב ETL אחרון</h2>
           <dl className="grid gap-2 sm:grid-cols-2">
             <div>

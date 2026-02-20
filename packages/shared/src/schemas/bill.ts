@@ -101,9 +101,7 @@ export const BillDetailSchema = BillSchema.extend({
       model: z.string(),
       generated_at: z.string().datetime(),
       source_fields: z.array(z.string()),
-      warning: z
-        .string()
-        .default("AI-generated summary; verify with official sources below."),
+      warning: z.string().default("AI-generated summary; verify with official sources below."),
     })
     .nullable(),
 });

@@ -27,11 +27,7 @@ async function getParties(search?: string): Promise<PartiesResponse | null> {
   }
 }
 
-export default async function PartiesPage({
-  searchParams,
-}: {
-  searchParams: { search?: string };
-}) {
+export default async function PartiesPage({ searchParams }: { searchParams: { search?: string } }) {
   const { search } = searchParams;
   const response = await getParties(search);
   const parties = response?.data ?? [];
@@ -60,11 +56,11 @@ export default async function PartiesPage({
             name="search"
             defaultValue={search}
             placeholder="חפש סיעה..."
-            className="flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            className="focus:border-brand-500 flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:outline-none"
           />
           <button
             type="submit"
-            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+            className="bg-brand-600 hover:bg-brand-700 rounded-lg px-4 py-2 text-sm font-medium text-white"
           >
             חפש
           </button>
@@ -92,12 +88,10 @@ export default async function PartiesPage({
             >
               <div className="mb-3 flex items-start justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-neutral-900 group-hover:text-brand-700">
+                  <h2 className="group-hover:text-brand-700 text-lg font-semibold text-neutral-900">
                     {party.name_he}
                   </h2>
-                  {party.name_en && (
-                    <p className="text-sm text-neutral-500">{party.name_en}</p>
-                  )}
+                  {party.name_en && <p className="text-sm text-neutral-500">{party.name_en}</p>}
                 </div>
                 {party.is_active ? (
                   <span className="badge bg-green-100 text-green-800">פעילה</span>

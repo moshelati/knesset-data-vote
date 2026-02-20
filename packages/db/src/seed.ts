@@ -67,7 +67,7 @@ async function main() {
     },
     {
       external_id: "demo_party_4",
-      name_he: "ש\"ס",
+      name_he: 'ש"ס',
       name_en: "Shas",
       abbreviation: "shas",
       seat_count: 11,
@@ -265,8 +265,7 @@ async function main() {
         external_source: "demo",
         title_he: b.title_he,
         title_en: b.title_en,
-        description_he:
-          "תיאור לדוגמה בלבד. נתונים אלה אינם ממקור רשמי ומיועדים להדגמת הממשק בלבד.",
+        description_he: "תיאור לדוגמה בלבד. נתונים אלה אינם ממקור רשמי ומיועדים להדגמת הממשק בלבד.",
         description_en:
           "Demo description only. This data is not from an official source and is intended only for UI demonstration.",
         status: b.status,
@@ -319,7 +318,7 @@ async function main() {
   if (mk1Ref) {
     await prisma.promise.create({
       data: {
-        text: "הצהרה לדוגמה: \\\"נעמיד את כלכלת ישראל בראש סדר העדיפויות\\\" (לדוגמה בלבד, לא ממקור רשמי)",
+        text: 'הצהרה לדוגמה: \\"נעמיד את כלכלת ישראל בראש סדר העדיפויות\\" (לדוגמה בלבד, לא ממקור רשמי)',
         category: "statement",
         topic: "economy",
         mk_id: mk1Ref.id,
@@ -333,9 +332,7 @@ async function main() {
   }
 
   console.info("✅ Demo seed complete.");
-  console.info(
-    "⚠️  All seeded data is marked is_demo=true and is for UI demonstration only.",
-  );
+  console.info("⚠️  All seeded data is marked is_demo=true and is for UI demonstration only.");
 }
 
 main()

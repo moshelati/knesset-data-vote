@@ -1,9 +1,5 @@
 import { ExternalLink } from "lucide-react";
-import {
-  mkOfficialUrl,
-  billOfficialUrl,
-  factionOfficialUrl,
-} from "@/lib/knesset-urls";
+import { mkOfficialUrl, billOfficialUrl, factionOfficialUrl } from "@/lib/knesset-urls";
 
 type EntityType = "mk" | "bill" | "party";
 
@@ -20,7 +16,10 @@ const DEFAULT_LABELS: Record<EntityType, string> = {
   party: "דף הסיעה באתר הרשמי",
 };
 
-function buildUrl(entityType: EntityType, externalId: string | number | null | undefined): string | null {
+function buildUrl(
+  entityType: EntityType,
+  externalId: string | number | null | undefined,
+): string | null {
   switch (entityType) {
     case "mk":
       return mkOfficialUrl(externalId);
@@ -37,11 +36,7 @@ function buildUrl(entityType: EntityType, externalId: string | number | null | u
  *
  * Shows nothing if externalId is missing.
  */
-export function OfficialLinksCard({
-  entityType,
-  externalId,
-  label,
-}: OfficialLinksCardProps) {
+export function OfficialLinksCard({ entityType, externalId, label }: OfficialLinksCardProps) {
   const url = buildUrl(entityType, externalId);
   if (!url) return null;
 
@@ -56,7 +51,7 @@ export function OfficialLinksCard({
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-900 hover:underline"
+        className="text-brand-700 hover:text-brand-900 inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
         aria-label={`${displayLabel} — נפתח בחלון חדש`}
       >
         <ExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />

@@ -7,8 +7,7 @@
  */
 
 export const KNESSET_HOME_URL = "https://www.knesset.gov.il";
-export const KNESSET_ODATA_BASE_URL =
-  "https://knesset.gov.il/Odata/ParliamentInfo.svc";
+export const KNESSET_ODATA_BASE_URL = "https://knesset.gov.il/Odata/ParliamentInfo.svc";
 
 /**
  * Deep-link to an MK's personal page on the official Knesset website.

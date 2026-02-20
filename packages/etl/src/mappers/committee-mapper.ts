@@ -78,7 +78,7 @@ export function mapCommittee(raw: RawCommittee): Prisma.CommitteeCreateInput {
     name_he: String(name),
     name_en: null,
     knesset_number: raw.KnessetNum ? Number(raw.KnessetNum) : null,
-    is_active: raw.IsCurrent !== undefined ? Boolean(raw.IsCurrent) : !(raw.FinishDate),
+    is_active: raw.IsCurrent !== undefined ? Boolean(raw.IsCurrent) : !raw.FinishDate,
     source_url: `${KNESSET_ODATA_BASE}/KNS_Committee(${id})`,
     last_seen_at: new Date(),
   };

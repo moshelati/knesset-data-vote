@@ -41,12 +41,10 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-700 to-brand-900 px-4 py-20 text-white">
+      <section className="from-brand-700 to-brand-900 bg-gradient-to-br px-4 py-20 text-white">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            הצביעו עם נתונים
-          </h1>
-          <p className="mb-8 text-xl text-brand-100">
+          <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">הצביעו עם נתונים</h1>
+          <p className="text-brand-100 mb-8 text-xl">
             מידע פרלמנטרי מאומת ממקורות רשמיים — ללא טענות שלא ניתן לאמת.
           </p>
 
@@ -66,7 +64,7 @@ export default async function HomePage() {
               />
               <button
                 type="submit"
-                className="flex items-center gap-2 rounded-l-xl bg-brand-500 px-6 py-4 font-semibold text-white hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-white"
+                className="bg-brand-500 hover:bg-brand-600 flex items-center gap-2 rounded-l-xl px-6 py-4 font-semibold text-white focus:outline-none focus:ring-2 focus:ring-white"
                 aria-label="חפש"
               >
                 <Search className="h-5 w-5" aria-hidden="true" />
@@ -76,7 +74,7 @@ export default async function HomePage() {
 
           {/* Last updated */}
           {meta?.last_updated && (
-            <p className="mt-4 flex items-center justify-center gap-1 text-sm text-brand-200">
+            <p className="text-brand-200 mt-4 flex items-center justify-center gap-1 text-sm">
               <RefreshCcw className="h-3 w-3" aria-hidden="true" />
               עדכון אחרון:{" "}
               {new Intl.DateTimeFormat("he-IL", {
@@ -91,8 +89,8 @@ export default async function HomePage() {
       {/* Demo warning */}
       {isDemo && (
         <div className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-center text-sm text-amber-800">
-          <strong>מצב הדגמה:</strong> הנתונים המוצגים הם לדוגמה בלבד ואינם ממקור רשמי.
-          הפעל <code className="font-mono">pnpm etl:sync</code> לטעינת נתוני הכנסת הרשמיים.
+          <strong>מצב הדגמה:</strong> הנתונים המוצגים הם לדוגמה בלבד ואינם ממקור רשמי. הפעל{" "}
+          <code className="font-mono">pnpm etl:sync</code> לטעינת נתוני הכנסת הרשמיים.
         </div>
       )}
 
@@ -101,19 +99,19 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-3xl font-bold text-brand-700">
+              <div className="text-brand-700 text-3xl font-bold">
                 {stats ? stats.parties.toLocaleString("he-IL") : "—"}
               </div>
               <div className="mt-1 text-sm text-neutral-600">סיעות</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-brand-700">
+              <div className="text-brand-700 text-3xl font-bold">
                 {stats ? stats.mks.toLocaleString("he-IL") : "—"}
               </div>
               <div className="mt-1 text-sm text-neutral-600">חברי כנסת</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-brand-700">
+              <div className="text-brand-700 text-3xl font-bold">
                 {stats ? stats.bills.toLocaleString("he-IL") : "—"}
               </div>
               <div className="mt-1 text-sm text-neutral-600">הצעות חוק</div>
@@ -147,8 +145,7 @@ export default async function HomePage() {
               {
                 href: "/bills",
                 title: "הצעות חוק",
-                description:
-                  "עיינו בהצעות חוק לפי נושא, מצב, ומגישים. קישורים למקורות לכל רשומה.",
+                description: "עיינו בהצעות חוק לפי נושא, מצב, ומגישים. קישורים למקורות לכל רשומה.",
                 icon: "📜",
                 ariaLabel: "עיין בהצעות חוק",
               },
@@ -160,7 +157,7 @@ export default async function HomePage() {
                 aria-label={ariaLabel}
               >
                 <div className="mb-3 text-3xl">{icon}</div>
-                <h3 className="mb-2 text-lg font-semibold text-neutral-900 group-hover:text-brand-700">
+                <h3 className="group-hover:text-brand-700 mb-2 text-lg font-semibold text-neutral-900">
                   {title}
                 </h3>
                 <p className="text-sm text-neutral-600">{description}</p>
@@ -173,9 +170,7 @@ export default async function HomePage() {
       {/* Transparency pledge */}
       <section className="bg-neutral-50 px-4 py-12">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mb-4 text-2xl font-bold text-neutral-900">
-            מחויבות לשקיפות
-          </h2>
+          <h2 className="mb-4 text-2xl font-bold text-neutral-900">מחויבות לשקיפות</h2>
           <div className="grid gap-4 text-sm text-neutral-700 sm:grid-cols-3">
             <div className="card p-4">
               <div className="mb-2 text-2xl">📎</div>
@@ -198,7 +193,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/methodology"
-            className="mt-6 inline-flex items-center gap-2 text-sm text-brand-600 hover:underline"
+            className="text-brand-600 mt-6 inline-flex items-center gap-2 text-sm hover:underline"
           >
             קראו על המתודולוגיה שלנו
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
@@ -230,8 +225,7 @@ export default async function HomePage() {
               {meta?.data_sources[0]?.entity_sets_discovered &&
                 meta.data_sources[0].entity_sets_discovered.length > 0 && (
                   <div className="mt-2 text-xs text-neutral-500">
-                    ישויות שהתגלו מ-OData:{" "}
-                    {meta.data_sources[0].entity_sets_discovered.join(", ")}
+                    ישויות שהתגלו מ-OData: {meta.data_sources[0].entity_sets_discovered.join(", ")}
                   </div>
                 )}
             </div>

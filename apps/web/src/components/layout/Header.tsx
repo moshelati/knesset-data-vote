@@ -7,49 +7,44 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-brand-700">
+          <Link href="/" className="text-brand-700 flex items-center gap-2 font-bold">
             <span className="text-xl">🏛</span>
             <span className="hidden text-lg sm:block">Knesset Vote</span>
-            <span className="text-xs font-normal text-neutral-500">
-              נתוני כנסת שקופים
-            </span>
+            <span className="text-xs font-normal text-neutral-500">נתוני כנסת שקופים</span>
           </Link>
 
           {/* Navigation */}
           <nav aria-label="Navigation" className="hidden gap-6 md:flex">
             <Link
               href="/parties"
-              className="text-sm font-medium text-neutral-600 hover:text-brand-700"
+              className="hover:text-brand-700 text-sm font-medium text-neutral-600"
             >
               סיעות
             </Link>
-            <Link
-              href="/mks"
-              className="text-sm font-medium text-neutral-600 hover:text-brand-700"
-            >
+            <Link href="/mks" className="hover:text-brand-700 text-sm font-medium text-neutral-600">
               חברי כנסת
             </Link>
             <Link
               href="/bills"
-              className="text-sm font-medium text-neutral-600 hover:text-brand-700"
+              className="hover:text-brand-700 text-sm font-medium text-neutral-600"
             >
               הצעות חוק
             </Link>
             <Link
               href="/votes"
-              className="text-sm font-medium text-neutral-600 hover:text-brand-700"
+              className="hover:text-brand-700 text-sm font-medium text-neutral-600"
             >
               הצבעות
             </Link>
             <Link
               href="/my-election"
-              className="text-sm font-semibold text-brand-700 hover:text-brand-900"
+              className="text-brand-700 hover:text-brand-900 text-sm font-semibold"
             >
               הבחירות שלי
             </Link>
             <Link
               href="/methodology"
-              className="text-sm font-medium text-neutral-600 hover:text-brand-700"
+              className="hover:text-brand-700 text-sm font-medium text-neutral-600"
             >
               מתודולוגיה
             </Link>

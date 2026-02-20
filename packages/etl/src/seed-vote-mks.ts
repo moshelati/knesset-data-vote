@@ -12,7 +12,7 @@ import { db } from "@knesset-vote/db";
 import { randomUUID } from "crypto";
 
 const BASE = "https://knesset.gov.il/OdataV4/ParliamentInfo";
-const BATCH = 10;   // vote IDs per OData filter
+const BATCH = 10; // vote IDs per OData filter
 const DELAY = 300;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));

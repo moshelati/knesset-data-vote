@@ -69,11 +69,16 @@ export interface RawVoteRecord {
  */
 export function mapVoteResult(resultCode?: number): string {
   switch (resultCode) {
-    case 7: return "yes";     // בעד
-    case 8: return "no";      // נגד
-    case 9: return "abstain"; // נמנע
-    case 11: return "yes";    // הצביע (manual show-of-hands, counted as for)
-    default: return "did_not_vote"; // 6=נוכח, 10=לא נכח, unknown
+    case 7:
+      return "yes"; // בעד
+    case 8:
+      return "no"; // נגד
+    case 9:
+      return "abstain"; // נמנע
+    case 11:
+      return "yes"; // הצביע (manual show-of-hands, counted as for)
+    default:
+      return "did_not_vote"; // 6=נוכח, 10=לא נכח, unknown
   }
 }
 
@@ -111,10 +116,7 @@ export function deriveVoteResult(
 
   // The "for" option being a constructive action = the bill/motion passed if yes won
   // We mark it as "passed" — outcome by yes/no counts is more reliable but not available here
-  const passedPatterns = [
-    "להעביר", "לאשר", "לכלול", "לאמץ", "להעלות",
-    "בעד", "אושר", "עבר",
-  ];
+  const passedPatterns = ["להעביר", "לאשר", "לכלול", "לאמץ", "להעלות", "בעד", "אושר", "עבר"];
   const rejectedPatterns = ["לדחות", "נגד", "נדחה"];
 
   const forLower = forDesc.toLowerCase();

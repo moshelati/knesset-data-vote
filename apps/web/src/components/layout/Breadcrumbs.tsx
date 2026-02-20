@@ -27,7 +27,11 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
       aria-label="פירורי לחם — מיקום בעמוד"
       className="mb-4 flex flex-wrap items-center gap-1 text-sm text-neutral-500"
     >
-      <ol className="flex flex-wrap items-center gap-1" itemScope itemType="https://schema.org/BreadcrumbList">
+      <ol
+        className="flex flex-wrap items-center gap-1"
+        itemScope
+        itemType="https://schema.org/BreadcrumbList"
+      >
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
@@ -39,10 +43,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
               itemType="https://schema.org/ListItem"
             >
               {index > 0 && (
-                <ChevronLeft
-                  className="h-3.5 w-3.5 shrink-0 text-neutral-400"
-                  aria-hidden="true"
-                />
+                <ChevronLeft className="h-3.5 w-3.5 shrink-0 text-neutral-400" aria-hidden="true" />
               )}
               {isLast || !item.href ? (
                 <span
@@ -55,7 +56,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
               ) : (
                 <Link
                   href={item.href}
-                  className="max-w-[160px] truncate hover:text-brand-700 hover:underline"
+                  className="hover:text-brand-700 max-w-[160px] truncate hover:underline"
                   itemProp="item"
                 >
                   <span itemProp="name">{item.label}</span>

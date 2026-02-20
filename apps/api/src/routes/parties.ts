@@ -22,7 +22,11 @@ export async function partyRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async (request, reply) => {
-      const { search, page = 1, limit = 20 } = request.query as {
+      const {
+        search,
+        page = 1,
+        limit = 20,
+      } = request.query as {
         search?: string;
         page?: number;
         limit?: number;

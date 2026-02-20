@@ -104,7 +104,12 @@ export function mapMemberFactionToMembership(
     external_source: "knesset_odata",
     knesset_number: raw.KnessetNum ? Number(raw.KnessetNum) : null,
     start_date: raw.StartDate ? new Date(raw.StartDate) : null,
-    end_date: raw.EndDate ? new Date(raw.EndDate) : raw.FinishDate ? new Date(raw.FinishDate) : null,
-    is_current: raw.IsCurrent !== undefined ? Boolean(raw.IsCurrent) : !(raw.EndDate ?? raw.FinishDate),
+    end_date: raw.EndDate
+      ? new Date(raw.EndDate)
+      : raw.FinishDate
+        ? new Date(raw.FinishDate)
+        : null,
+    is_current:
+      raw.IsCurrent !== undefined ? Boolean(raw.IsCurrent) : !(raw.EndDate ?? raw.FinishDate),
   };
 }

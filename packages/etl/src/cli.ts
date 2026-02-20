@@ -25,10 +25,7 @@ async function main() {
     const result = await runSync();
 
     if (result.status === "failed") {
-      logger.error(
-        { runId: result.runId, errors: result.errors },
-        "ETL sync failed",
-      );
+      logger.error({ runId: result.runId, errors: result.errors }, "ETL sync failed");
       logger.info(
         "Tip: If the Knesset OData API is unreachable, run `pnpm db:seed` to load demo data.",
       );
@@ -56,8 +53,19 @@ async function main() {
     process.exit(0);
   }
 
+  if (command === "backfill") {
+    const { runBackfill } = await import("./backfill/backfill-bill-roles.js");
+    const result = await runBackfill();
+    logger.info(result, "Backfill complete");
+    const { db } = await import("@knesset-vote/db");
+    await db.$disconnect();
+    process.exit(0);
+  }
+
   console.error(`Unknown command: ${command ?? "(none)"}`);
-  console.error("Usage: tsx src/cli.ts sync [--demo] | tsx src/cli.ts aggregate");
+  console.error(
+    "Usage: tsx src/cli.ts sync [--demo] | tsx src/cli.ts aggregate | tsx src/cli.ts backfill",
+  );
   process.exit(1);
 }
 

@@ -93,8 +93,7 @@ function buildMetadata(parsed: RawMetadata, baseUrl: string): ODataMetadata {
   const entitySets: ODataEntitySet[] = [];
   const entityTypeMap = new Map<string, ODataProperty[]>();
 
-  const schemas =
-    parsed?.["edmx:Edmx"]?.["edmx:DataServices"]?.[0]?.["Schema"] ?? [];
+  const schemas = parsed?.["edmx:Edmx"]?.["edmx:DataServices"]?.[0]?.["Schema"] ?? [];
 
   // First pass: collect entity type property definitions
   for (const schema of schemas) {
@@ -120,7 +119,7 @@ function buildMetadata(parsed: RawMetadata, baseUrl: string): ODataMetadata {
         const entityType = entitySet.$.EntityType;
         // EntityType is usually namespace-qualified: e.g. "KnessetOdata.Faction"
         const shortTypeName = entityType.includes(".")
-          ? entityType.split(".").pop() ?? entityType
+          ? (entityType.split(".").pop() ?? entityType)
           : entityType;
 
         entitySets.push({

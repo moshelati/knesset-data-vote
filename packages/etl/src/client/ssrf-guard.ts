@@ -43,10 +43,7 @@ export function assertAllowedUrl(url: string): void {
   }
 }
 
-export async function safeFetch(
-  url: string,
-  options?: RequestInit,
-): Promise<Response> {
+export async function safeFetch(url: string, options?: RequestInit): Promise<Response> {
   assertAllowedUrl(url);
   return fetch(url, {
     ...options,
