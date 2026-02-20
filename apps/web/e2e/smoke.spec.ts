@@ -16,11 +16,12 @@ test.describe("Home page", () => {
     const searchInput = page.getByRole("textbox", { name: "חיפוש" });
     await expect(searchInput).toBeVisible();
 
-    // Navigation present
-    await expect(page.getByRole("link", { name: "סיעות" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "חברי כנסת" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "הצעות חוק" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "מתודולוגיה" })).toBeVisible();
+    // Navigation present (scope to header nav to avoid footer/body duplicates)
+    const nav = page.getByRole("navigation", { name: "Navigation" });
+    await expect(nav.getByRole("link", { name: "סיעות" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "חברי כנסת" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "הצעות חוק" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "מתודולוגיה" })).toBeVisible();
   });
 
   test("shows data source information", async ({ page }) => {
@@ -101,16 +102,17 @@ test.describe("Methodology page", () => {
     await page.goto(`${BASE_URL}/methodology`);
     await expect(page).toHaveTitle(/מתודולוגיה/i);
 
-    // Key sections present
-    await expect(page.getByText("עקרונות יסוד")).toBeVisible();
-    await expect(page.getByText("מקורות נתונים")).toBeVisible();
-    await expect(page.getByText("מגבלות ידועות")).toBeVisible();
+    // Key sections present — use heading role to avoid TOC link duplicates
+    await expect(page.getByRole("heading", { name: "עקרונות יסוד" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "מקורות נתונים" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "מגבלות ידועות" })).toBeVisible();
   });
 
   test("shows neutral language principles", async ({ page }) => {
     await page.goto(`${BASE_URL}/methodology`);
     await expect(page.getByText("Matched parliamentary activity found")).toBeVisible();
-    await expect(page.getByText("Not available from source")).toBeVisible();
+    // Text appears in both a <code> element and a table cell — use .first() to avoid strict-mode violation
+    await expect(page.getByText("Not available from source").first()).toBeVisible();
   });
 
   test("has table of contents with working anchors", async ({ page }) => {
