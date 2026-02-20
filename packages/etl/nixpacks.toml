@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm install -g pnpm@9", "cd /app && pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = [
+  "pnpm --filter @knesset-vote/shared build",
+  "pnpm --filter @knesset-vote/db generate",
+  "pnpm --filter @knesset-vote/db build"
+]
+
+[start]
+cmd = "pnpm --filter @knesset-vote/etl sync && pnpm --filter @knesset-vote/etl aggregate"
