@@ -74,6 +74,11 @@ jobs:
       - name: Build shared package
         run: pnpm --filter @knesset-vote/shared build
 
+      - name: Build db package
+        run: pnpm --filter @knesset-vote/db build
+        env:
+          DATABASE_URL: "postgresql://user:pw@localhost:5432/db"
+
       - name: Run ETL unit tests
         run: pnpm --filter @knesset-vote/etl test
 
@@ -123,6 +128,9 @@ jobs:
 
       - name: Build shared package
         run: pnpm --filter @knesset-vote/shared build
+
+      - name: Build db package
+        run: pnpm --filter @knesset-vote/db build
 
       - name: Run API tests
         run: pnpm --filter @knesset-vote/api test
