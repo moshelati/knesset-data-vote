@@ -17,6 +17,9 @@ export async function mkRoutes(app: FastifyInstance): Promise<void> {
             party_id: { type: "string" },
             is_current: { type: "boolean", default: true },
             knesset_number: { type: "integer" },
+            coalition: { type: "string", enum: ["coalition", "opposition"] },
+            gender: { type: "string", enum: ["male", "female"] },
+            role: { type: "string", enum: ["minister", "committee_chair"] },
             sort: { type: "string", enum: ["name", "bills", "party"] },
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 200, default: 20 },
@@ -30,6 +33,9 @@ export async function mkRoutes(app: FastifyInstance): Promise<void> {
         party_id,
         is_current = true,
         knesset_number,
+        coalition,
+        gender,
+        role,
         sort,
         page = 1,
         limit = 20,
@@ -38,6 +44,9 @@ export async function mkRoutes(app: FastifyInstance): Promise<void> {
         party_id?: string;
         is_current?: boolean;
         knesset_number?: number;
+        coalition?: "coalition" | "opposition";
+        gender?: "male" | "female";
+        role?: "minister" | "committee_chair";
         sort?: string;
         page?: number;
         limit?: number;
@@ -48,12 +57,15 @@ export async function mkRoutes(app: FastifyInstance): Promise<void> {
         party_id,
         is_current,
         knesset_number,
+        coalition,
+        gender,
+        role,
         sort,
         page,
         limit,
       });
       const result = await getCached(cacheKey, CACHE_TTL.SHORT, () =>
-        listMKs({ search, party_id, is_current, knesset_number, sort, page, limit }),
+        listMKs({ search, party_id, is_current, knesset_number, coalition, gender, role, sort, page, limit }),
       );
 
       reply.send({

@@ -99,16 +99,24 @@ function mapSourceLinks(links: Awaited<ReturnType<typeof getSourceLinks>>) {
   }));
 }
 
+// Minister / deputy minister position IDs (current roles only)
+const MINISTER_POSITION_IDS_SET = new Set([39, 57, 45, 31, 50, 40, 59, 51, 285079]);
+const COMMITTEE_CHAIR_POSITION_IDS_SET = new Set([41, 61]);
+
 export async function listMKs(opts: {
   search?: string;
   party_id?: string;
   is_current?: boolean;
   knesset_number?: number;
+  coalition?: "coalition" | "opposition";
+  gender?: "male" | "female";
+  role?: "minister" | "committee_chair";
   sort?: string;
   page: number;
   limit: number;
 }): Promise<{ data: MK[]; total: number }> {
-  const { search, party_id, is_current, knesset_number, page, limit } = opts;
+  const { search, party_id, is_current, knesset_number, coalition, gender, role, page, limit } =
+    opts;
   const skip = (page - 1) * limit;
 
   const where: NonNullable<Parameters<typeof db.mK.findMany>[0]>["where"] = {};
@@ -126,7 +134,26 @@ export async function listMKs(opts: {
     where.is_current = is_current;
   }
 
-  if (knesset_number) {
+  if (gender) {
+    where.gender = gender;
+  }
+
+  // Filter by coalition/opposition — resolved via party external_id sets
+  if (coalition === "coalition") {
+    where.memberships = {
+      some: {
+        is_current: true,
+        party: { external_id: { in: [...KNESSET_25_COALITION] } },
+      },
+    };
+  } else if (coalition === "opposition") {
+    where.memberships = {
+      some: {
+        is_current: true,
+        party: { external_id: { in: [...KNESSET_25_OPPOSITION] } },
+      },
+    };
+  } else if (knesset_number) {
     where.memberships = {
       some: { knesset_number },
     };
@@ -139,6 +166,23 @@ export async function listMKs(opts: {
         party: {
           OR: [{ id: party_id }, { external_id: party_id }],
         },
+      },
+    };
+  }
+
+  // Filter by role: minister or committee chair — using GovernmentRole / CommitteeMembership
+  if (role === "minister") {
+    where.government_roles = {
+      some: {
+        is_current: true,
+        position_id: { in: [...MINISTER_POSITION_IDS_SET] },
+      },
+    };
+  } else if (role === "committee_chair") {
+    where.committee_memberships = {
+      some: {
+        is_current: true,
+        role: { in: ["chairman", "deputy_chairman"] },
       },
     };
   }
@@ -168,6 +212,18 @@ export async function listMKs(opts: {
           },
           take: 1,
         },
+        // Fetch current government roles to show minister badge on list
+        government_roles: {
+          where: { is_current: true },
+          select: { position_id: true, position_label: true, duty_desc: true },
+          take: 1,
+        },
+        // Fetch current committee chair roles
+        committee_memberships: {
+          where: { is_current: true, role: { in: ["chairman", "deputy_chairman"] } },
+          select: { role: true, committee: { select: { name_he: true } } },
+          take: 1,
+        },
       },
     }),
     db.mK.count({ where }),
@@ -183,6 +239,24 @@ export async function listMKs(opts: {
   return {
     data: mksWithSources.map((mk) => {
       const currentMembership = mk.memberships[0];
+      const govRole = mk.government_roles[0] ?? null;
+      const committeeChair = mk.committee_memberships[0] ?? null;
+
+      // Build role_badges for list card display
+      const role_badges: { label: string; type: "minister" | "committee_chair" }[] = [];
+      if (govRole) {
+        role_badges.push({
+          label: govRole.duty_desc ?? govRole.position_label,
+          type: "minister",
+        });
+      }
+      if (committeeChair) {
+        role_badges.push({
+          label: committeeChair.committee.name_he,
+          type: "committee_chair",
+        });
+      }
+
       return {
         id: mk.id,
         external_id: mk.external_id,
@@ -199,6 +273,7 @@ export async function listMKs(opts: {
           currentMembership?.party.external_id ?? null,
           currentMembership?.party.knesset_number ?? null,
         ),
+        role_badges,
         source_url: mk.source_url,
         image_url: mk.image_url,
         last_seen_at: mk.last_seen_at?.toISOString() ?? null,

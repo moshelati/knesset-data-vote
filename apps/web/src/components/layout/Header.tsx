@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { Search, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { GlobalSearch } from "@/components/shared/GlobalSearch";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const navLinks = [
     { href: "/parties", label: "סיעות" },
@@ -22,14 +24,16 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="text-brand-700 flex items-center gap-2 font-bold">
+          <Link href="/" className="text-brand-700 flex shrink-0 items-center gap-2 font-bold">
             <span className="text-xl">🏛</span>
             <span className="hidden text-lg sm:block">Knesset Vote</span>
-            <span className="text-xs font-normal text-neutral-500">נתוני כנסת שקופים</span>
+            <span className="hidden text-xs font-normal text-neutral-500 lg:block">
+              נתוני כנסת שקופים
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav aria-label="Navigation" className="hidden gap-6 md:flex">
+          <nav aria-label="Navigation" className="hidden gap-5 xl:flex">
             {navLinks.map(({ href, label, bold }) => (
               <Link
                 key={href}
@@ -46,22 +50,32 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* Search button — desktop only */}
-            <Link
-              href="/search"
-              className="hidden items-center gap-2 rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-500 hover:bg-neutral-100 md:flex"
-              aria-label="חיפוש"
+            {/* GlobalSearch — desktop (md+) */}
+            <div className="hidden w-56 md:block lg:w-72">
+              <GlobalSearch />
+            </div>
+
+            {/* Mobile search toggle */}
+            <button
+              className="flex items-center justify-center rounded-lg p-2 text-neutral-600 hover:bg-neutral-100 md:hidden"
+              aria-label={mobileSearchOpen ? "סגור חיפוש" : "פתח חיפוש"}
+              onClick={() => {
+                setMobileSearchOpen((v) => !v);
+                setMenuOpen(false);
+              }}
             >
-              <Search className="h-4 w-4" aria-hidden="true" />
-              <span>חפש...</span>
-            </Link>
+              <Search className="h-5 w-5" />
+            </button>
 
             {/* Mobile hamburger */}
             <button
               className="flex items-center justify-center rounded-lg p-2 text-neutral-600 hover:bg-neutral-100 md:hidden"
               aria-label={menuOpen ? "סגור תפריט" : "פתח תפריט"}
               aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((v) => !v)}
+              onClick={() => {
+                setMenuOpen((v) => !v);
+                setMobileSearchOpen(false);
+              }}
             >
               {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -69,20 +83,17 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile search bar */}
+      {mobileSearchOpen && (
+        <div className="border-t border-neutral-200 bg-white px-4 py-3 md:hidden">
+          <GlobalSearch />
+        </div>
+      )}
+
+      {/* Mobile nav menu */}
       {menuOpen && (
         <div className="border-t border-neutral-200 bg-white md:hidden">
           <nav className="flex flex-col px-4 py-3" aria-label="תפריט ניווט">
-            {/* Search in mobile menu */}
-            <Link
-              href="/search"
-              className="flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
-              onClick={() => setMenuOpen(false)}
-            >
-              <Search className="h-4 w-4" aria-hidden="true" />
-              חיפוש
-            </Link>
-            <div className="my-1 border-t border-neutral-100" />
             {navLinks.map(({ href, label, bold }) => (
               <Link
                 key={href}
