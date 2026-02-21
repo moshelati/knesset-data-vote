@@ -27,11 +27,7 @@ async function getMinister(id: string): Promise<GovernmentMinisterDetail | null>
   }
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const minister = await getMinister(params.id);
   if (!minister) return { title: "שר לא נמצא" };
   const name = minister.mk.name_he;
@@ -58,11 +54,7 @@ function timeInOffice(startDate: string | null): string {
   return `${years} שנים ו-${months} חודשים`;
 }
 
-export default async function MinisterDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function MinisterDetailPage({ params }: { params: { id: string } }) {
   const minister = await getMinister(params.id);
   if (!minister) notFound();
 
@@ -97,9 +89,7 @@ export default async function MinisterDetailPage({
             ) : (
               <div
                 className={`flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold ${
-                  isPM
-                    ? "bg-purple-100 text-purple-700"
-                    : "bg-brand-100 text-brand-700"
+                  isPM ? "bg-purple-100 text-purple-700" : "bg-brand-100 text-brand-700"
                 }`}
               >
                 {mk.name_he.charAt(0)}
@@ -112,19 +102,13 @@ export default async function MinisterDetailPage({
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-neutral-900">{mk.name_he}</h1>
-                {mk.name_en && (
-                  <p className="text-neutral-500">{mk.name_en}</p>
-                )}
+                {mk.name_en && <p className="text-neutral-500">{mk.name_en}</p>}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {isPM && (
-                  <span className="badge bg-purple-100 px-3 py-1 text-purple-800">
-                    ראש הממשלה
-                  </span>
+                  <span className="badge bg-purple-100 px-3 py-1 text-purple-800">ראש הממשלה</span>
                 )}
-                <span className="badge bg-green-100 px-3 py-1 text-green-800">
-                  שר/ה בתפקיד
-                </span>
+                <span className="badge bg-green-100 px-3 py-1 text-green-800">שר/ה בתפקיד</span>
               </div>
             </div>
 
@@ -162,9 +146,7 @@ export default async function MinisterDetailPage({
             {/* Term */}
             <p className="mt-1 text-sm text-neutral-500">
               ממשלה {role.government_num ?? "—"} · כנסת {role.knesset_num ?? "—"}
-              {role.start_date && (
-                <> · מאז {formatDateShort(role.start_date)}</>
-              )}
+              {role.start_date && <> · מאז {formatDateShort(role.start_date)}</>}
             </p>
 
             {/* Source + links */}
@@ -263,10 +245,7 @@ export default async function MinisterDetailPage({
       {/* Committee roles */}
       {committee_roles.length > 0 && (
         <section className="mb-8" aria-labelledby="committees-heading">
-          <h2
-            id="committees-heading"
-            className="mb-4 text-xl font-semibold text-neutral-900"
-          >
+          <h2 id="committees-heading" className="mb-4 text-xl font-semibold text-neutral-900">
             ועדות כנסת
           </h2>
           <CommitteeList committees={committee_roles} />

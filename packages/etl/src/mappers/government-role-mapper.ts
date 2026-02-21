@@ -69,8 +69,7 @@ export function mapPersonToPositionToGovernmentRole(
 ): Prisma.GovernmentRoleUncheckedCreateInput {
   const id = getPersonToPositionId(raw);
   const externalId = String(id);
-  const positionLabel =
-    MINISTER_POSITION_LABELS[raw.PositionID] ?? `תפקיד ${raw.PositionID}`;
+  const positionLabel = MINISTER_POSITION_LABELS[raw.PositionID] ?? `תפקיד ${raw.PositionID}`;
 
   const sourceUrl = `${KNESSET_ODATA_V2_BASE}/KNS_PersonToPosition(${externalId})`;
 

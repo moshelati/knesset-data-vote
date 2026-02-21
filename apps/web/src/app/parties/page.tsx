@@ -18,7 +18,10 @@ interface PartiesResponse {
   pages: number;
 }
 
-type PartyWithCoalition = Party & { coalition_status?: "coalition" | "opposition" | null; is_demo?: boolean };
+type PartyWithCoalition = Party & {
+  coalition_status?: "coalition" | "opposition" | null;
+  is_demo?: boolean;
+};
 
 interface FactionGroup {
   name_he: string;
@@ -98,7 +101,9 @@ export default async function PartiesPage({
   }
 
   // Separate factions that appear in Knesset 25 from purely historical ones
-  const currentGroups = groups.filter((g) => g.current?.knesset_number === 25 || (g.current?.knesset_number ?? 0) >= 25);
+  const currentGroups = groups.filter(
+    (g) => g.current?.knesset_number === 25 || (g.current?.knesset_number ?? 0) >= 25,
+  );
   const historicalGroups = groups.filter((g) => (g.current?.knesset_number ?? 0) < 25);
 
   return (
@@ -171,14 +176,16 @@ export default async function PartiesPage({
 
           {/* Historical factions accordion */}
           {historicalGroups.length > 0 && !search && !bloc && (
-            <details className="mt-10 group">
+            <details className="group mt-10">
               <summary className="cursor-pointer list-none">
                 <div className="flex items-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 hover:bg-neutral-50">
                   <span className="text-sm font-medium text-neutral-600">
                     סיעות היסטוריות ({historicalGroups.length})
                   </span>
                   <span className="text-xs text-neutral-400">— לא מיוצגות בכנסת 25</span>
-                  <span className="mr-auto text-neutral-400 transition-transform group-open:rotate-180">▼</span>
+                  <span className="mr-auto text-neutral-400 transition-transform group-open:rotate-180">
+                    ▼
+                  </span>
                 </div>
               </summary>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -211,7 +218,7 @@ function FactionCard({ group, historical = false }: { group: FactionGroup; histo
         <div className="min-w-0 flex-1">
           <Link
             href={`/parties/${party.id}`}
-            className="group-hover:text-brand-700 text-lg font-semibold leading-tight text-neutral-900 hover:text-brand-700"
+            className="group-hover:text-brand-700 hover:text-brand-700 text-lg font-semibold leading-tight text-neutral-900"
           >
             {party.name_he}
           </Link>
@@ -250,7 +257,7 @@ function FactionCard({ group, historical = false }: { group: FactionGroup; histo
 
       {/* Knesset history accordion */}
       {hasHistory && (
-        <details className="mt-3 group/hist">
+        <details className="group/hist mt-3">
           <summary className="cursor-pointer list-none">
             <span className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-600">
               <span className="transition-transform group-open/hist:rotate-90">▶</span>
@@ -264,7 +271,7 @@ function FactionCard({ group, historical = false }: { group: FactionGroup; histo
                 <Link
                   key={p.id}
                   href={`/parties/${p.id}`}
-                  className="rounded border border-neutral-200 px-2 py-0.5 text-xs text-neutral-500 hover:border-brand-400 hover:text-brand-600"
+                  className="hover:border-brand-400 hover:text-brand-600 rounded border border-neutral-200 px-2 py-0.5 text-xs text-neutral-500"
                   title={`כנסת ${p.knesset_number}${p.seat_count ? ` — ${p.seat_count} מנדטים` : ""}`}
                 >
                   כנסת {p.knesset_number}

@@ -20,7 +20,7 @@ interface SearchResponse {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  mk: "ח\"כ",
+  mk: 'ח"כ',
   party: "סיעה",
   bill: "הצעת חוק",
 };
@@ -52,10 +52,9 @@ export function GlobalSearch() {
     setLoading(true);
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-      const res = await fetch(
-        `${apiBase}/api/search?q=${encodeURIComponent(q)}&type=all`,
-        { headers: { "Content-Type": "application/json" } },
-      );
+      const res = await fetch(`${apiBase}/api/search?q=${encodeURIComponent(q)}&type=all`, {
+        headers: { "Content-Type": "application/json" },
+      });
       if (!res.ok) throw new Error("search failed");
       const data: SearchResponse = await res.json();
       setResults(data.data.slice(0, 12));
@@ -143,7 +142,7 @@ export function GlobalSearch() {
   return (
     <div className="relative" role="search">
       {/* Input */}
-      <div className="flex items-center gap-2 rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-1.5 focus-within:border-brand-500 focus-within:bg-white transition-colors">
+      <div className="focus-within:border-brand-500 flex items-center gap-2 rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-1.5 transition-colors focus-within:bg-white">
         {loading ? (
           <Loader2 className="h-4 w-4 shrink-0 animate-spin text-neutral-400" aria-hidden="true" />
         ) : (
@@ -229,7 +228,7 @@ export function GlobalSearch() {
                 <Link
                   href={`/search?q=${encodeURIComponent(query.trim())}`}
                   onClick={closeSearch}
-                  className="block border-t border-neutral-100 px-4 py-2.5 text-center text-sm text-brand-600 hover:bg-neutral-50"
+                  className="text-brand-600 block border-t border-neutral-100 px-4 py-2.5 text-center text-sm hover:bg-neutral-50"
                 >
                   כל התוצאות עבור &ldquo;{query}&rdquo; →
                 </Link>

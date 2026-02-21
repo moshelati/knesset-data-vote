@@ -50,7 +50,7 @@ export default async function GovernmentPage() {
             href="https://knesset.gov.il/Odata/ParliamentInfo.svc/KNS_PersonToPosition"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-neutral-500 hover:text-neutral-700 underline"
+            className="text-neutral-500 underline hover:text-neutral-700"
           >
             מקור: Knesset OData ↗
           </a>
@@ -76,8 +76,7 @@ export default async function GovernmentPage() {
           <div className="mt-8 rounded-md bg-amber-50 p-4 text-sm text-amber-800">
             <p className="font-semibold">⚠️ הערה מתודולוגית</p>
             <p className="mt-1">
-              הצעות החוק הקשורות מסוננות לפי נושא המשרד — לא ייחוס סיבתי ישיר לשר.
-              ראו{" "}
+              הצעות החוק הקשורות מסוננות לפי נושא המשרד — לא ייחוס סיבתי ישיר לשר. ראו{" "}
               <Link href="/methodology#government-roles" className="underline">
                 מתודולוגיה
               </Link>{" "}

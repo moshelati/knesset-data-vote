@@ -23,8 +23,7 @@ import { saveSnapshot } from "./snapshot.js";
 import type { ETLRunTracker } from "./run-tracker.js";
 import { logger } from "../logger.js";
 
-const ODATA_V4_BASE =
-  process.env["KNESSET_ODATA_BASE_URL"] ?? KNESSET_ODATA_BASE;
+const ODATA_V4_BASE = process.env["KNESSET_ODATA_BASE_URL"] ?? KNESSET_ODATA_BASE;
 
 const PAGE_SIZE = 100;
 

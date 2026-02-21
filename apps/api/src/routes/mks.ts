@@ -65,7 +65,18 @@ export async function mkRoutes(app: FastifyInstance): Promise<void> {
         limit,
       });
       const result = await getCached(cacheKey, CACHE_TTL.SHORT, () =>
-        listMKs({ search, party_id, is_current, knesset_number, coalition, gender, role, sort, page, limit }),
+        listMKs({
+          search,
+          party_id,
+          is_current,
+          knesset_number,
+          coalition,
+          gender,
+          role,
+          sort,
+          page,
+          limit,
+        }),
       );
 
       reply.send({

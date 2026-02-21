@@ -51,9 +51,7 @@ export function MinisterCard({ minister }: MinisterCardProps) {
           ) : (
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-full text-base font-bold ${
-                isPM
-                  ? "bg-purple-100 text-purple-700"
-                  : "bg-brand-100 text-brand-700"
+                isPM ? "bg-purple-100 text-purple-700" : "bg-brand-100 text-brand-700"
               }`}
             >
               {mk.name_he.charAt(0)}
@@ -89,13 +87,9 @@ export function MinisterCard({ minister }: MinisterCardProps) {
       {/* Time in office */}
       <div className="flex items-center gap-2 text-xs text-neutral-500">
         <span>בתפקיד:</span>
-        <span className="font-medium text-neutral-700">
-          {timeInOffice(role.start_date)}
-        </span>
+        <span className="font-medium text-neutral-700">{timeInOffice(role.start_date)}</span>
         {role.start_date && (
-          <span className="text-neutral-400">
-            (מאז {formatDateShort(role.start_date)})
-          </span>
+          <span className="text-neutral-400">(מאז {formatDateShort(role.start_date)})</span>
         )}
       </div>
 
@@ -109,9 +103,7 @@ export function MinisterCard({ minister }: MinisterCardProps) {
             {related_bills.map((bill) => (
               <li key={bill.id} className="flex items-start gap-2">
                 <BillStatusBadge status={bill.status ?? "unknown"} />
-                <span className="line-clamp-2 text-xs text-neutral-700">
-                  {bill.title_he}
-                </span>
+                <span className="line-clamp-2 text-xs text-neutral-700">{bill.title_he}</span>
               </li>
             ))}
           </ul>

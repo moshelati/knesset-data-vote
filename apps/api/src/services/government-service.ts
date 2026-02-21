@@ -112,7 +112,9 @@ export async function listMinisters(): Promise<{
         include: {
           memberships: {
             where: { is_current: true },
-            include: { party: { select: { id: true, name_he: true, name_en: true, external_id: true } } },
+            include: {
+              party: { select: { id: true, name_he: true, name_en: true, external_id: true } },
+            },
             take: 1,
             orderBy: { knesset_number: "desc" },
           },
@@ -181,7 +183,9 @@ export async function getMinisterById(mkId: string): Promise<GovernmentMinisterD
         include: {
           memberships: {
             where: { is_current: true },
-            include: { party: { select: { id: true, name_he: true, name_en: true, external_id: true } } },
+            include: {
+              party: { select: { id: true, name_he: true, name_en: true, external_id: true } },
+            },
             take: 1,
             orderBy: { knesset_number: "desc" },
           },
