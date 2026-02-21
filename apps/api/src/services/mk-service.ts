@@ -101,7 +101,6 @@ function mapSourceLinks(links: Awaited<ReturnType<typeof getSourceLinks>>) {
 
 // Minister / deputy minister position IDs (current roles only)
 const MINISTER_POSITION_IDS_SET = new Set([39, 57, 45, 31, 50, 40, 59, 51, 285079]);
-const COMMITTEE_CHAIR_POSITION_IDS_SET = new Set([41, 61]);
 
 export async function listMKs(opts: {
   search?: string;
