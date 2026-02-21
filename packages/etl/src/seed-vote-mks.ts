@@ -26,13 +26,13 @@ async function main() {
 
   // 2. Get existing MK external_ids
   const existingMks = await db.mK.findMany({ select: { id: true, external_id: true } });
-  const mkIdMap = new Map<string, string>(existingMks.map((m) => [m.external_id, m.id]));
+  const mkIdMap = new Map<string, string>(existingMks.map((m: { external_id: string; id: string }) => [m.external_id, m.id]));
   console.log(`MKs already in DB: ${mkIdMap.size}`);
 
   // 3. For each batch of votes, fetch all VoteResult rows and collect unique MkIds
   const missingMks = new Map<number, { firstName: string; lastName: string }>();
 
-  const voteOdataIds = votes.map((v) => Number(v.external_id)).filter(Boolean);
+  const voteOdataIds = votes.map((v: { id: string; external_id: string }) => Number(v.external_id)).filter(Boolean);
   let batchNum = 0;
 
   console.log(`\nScanning VoteResult for ${voteOdataIds.length} votes in batches of ${BATCH}...`);

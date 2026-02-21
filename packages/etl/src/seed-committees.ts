@@ -67,7 +67,7 @@ async function main() {
 
   // ── 1. Load MK map ──────────────────────────────────────────────────────────
   const mks = await db.mK.findMany({ select: { id: true, external_id: true } });
-  const mkMap = new Map(mks.map((m) => [m.external_id, m.id]));
+  const mkMap = new Map(mks.map((m: { external_id: string; id: string }) => [m.external_id, m.id]));
   console.log(`Found ${mks.length} MKs`);
 
   // ── 2. Fetch + upsert all committees ────────────────────────────────────────
