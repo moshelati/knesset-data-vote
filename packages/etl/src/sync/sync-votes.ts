@@ -18,36 +18,33 @@ import { ETL_CONCURRENCY } from "@knesset-vote/shared";
 import {
   VOTES_V4_BASE,
   VOTE_HEADER_ENTITY,
-  VOTE_RECORD_ENTITY,
   mapVoteHeaderToVote,
-  mapVoteResult,
   type RawVoteHeader,
-  type RawVoteRecord,
 } from "../mappers/vote-mapper.js";
 import type { ETLRunTracker } from "./run-tracker.js";
 import { logger } from "../logger.js";
 import { safeFetch } from "../client/ssrf-guard.js";
 
-const PAGE_SIZE = 100;
+interface ODataPage<T> {
+  value: T[];
+  "@odata.nextLink"?: string;
+}
 
-async function fetchVotesPage<T>(entity: string, skip: number): Promise<T[]> {
-  const url = `${VOTES_V4_BASE}/${entity}?$top=${PAGE_SIZE}&$skip=${skip}&$format=json`;
+async function fetchVotesNextLink<T>(url: string): Promise<ODataPage<T>> {
   const res = await safeFetch(url);
   if (!res.ok) {
     throw new Error(`Votes OData v4 fetch failed: ${res.status} ${res.statusText} — ${url}`);
   }
-  const data = (await res.json()) as { value?: T[] };
-  return data.value ?? [];
+  return res.json() as Promise<ODataPage<T>>;
 }
 
 async function* fetchAllVotePages<T>(entity: string): AsyncGenerator<T[]> {
-  let skip = 0;
-  while (true) {
-    const page = await fetchVotesPage<T>(entity, skip);
-    if (page.length === 0) break;
-    yield page;
-    if (page.length < PAGE_SIZE) break;
-    skip += PAGE_SIZE;
+  let nextUrl: string | undefined = `${VOTES_V4_BASE}/${entity}`;
+  while (nextUrl) {
+    const page = await fetchVotesNextLink<T>(nextUrl);
+    if (!page.value || page.value.length === 0) break;
+    yield page.value;
+    nextUrl = page["@odata.nextLink"];
   }
 }
 
@@ -104,54 +101,11 @@ export async function syncVotes(
 
   logger.info({ votes: voteIdMap.size }, "Vote headers synced");
 
-  // Step 2: Sync individual MK vote records (KNS_PlenumVoteResult)
-  logger.info("Syncing MK vote records from KNS_PlenumVoteResult");
-  for await (const page of fetchAllVotePages<RawVoteRecord>(VOTE_RECORD_ENTITY)) {
-    await Promise.all(
-      page.map((raw) =>
-        limit(async () => {
-          tracker.increment("vote_record", "fetched");
-          try {
-            const voteId = raw.VoteID;
-            if (!voteId) return;
-
-            const voteDbId = voteIdMap.get(voteId);
-            if (!voteDbId) return; // vote not in our DB
-
-            // MkId IS the PersonID directly (no zero-padding needed)
-            if (!raw.MkId) return;
-            const mkDbId = mkIdMap.get(String(raw.MkId));
-            if (!mkDbId) return; // MK not in our DB
-
-            const position = mapVoteResult(raw.ResultCode);
-
-            await db.voteRecord.upsert({
-              where: {
-                vote_id_mk_id: {
-                  vote_id: voteDbId,
-                  mk_id: mkDbId,
-                },
-              },
-              create: {
-                vote_id: voteDbId,
-                mk_id: mkDbId,
-                external_source: "knesset_v4",
-                position,
-              },
-              update: {
-                position,
-              },
-            });
-
-            tracker.increment("vote_record", "created");
-          } catch (err) {
-            tracker.increment("vote_record", "failed");
-            logger.error({ raw, err }, "Failed to sync vote record");
-          }
-        }),
-      ),
-    );
-  }
+  // Step 2: VoteRecords (KNS_PlenumVoteResult) — 1.85M rows, skipped in nightly cron.
+  // Too large for a single deployment run (~2h at 20s/page from Railway).
+  // TODO: run as a separate backfill job with resumable pagination checkpointing.
+  logger.info("Skipping VoteRecord sync (1.85M rows — use dedicated backfill job for this)");
+  tracker.initEntity("vote_record"); // ensure the entity exists in the summary
 
   const summary = tracker.getSummary();
   logger.info(
