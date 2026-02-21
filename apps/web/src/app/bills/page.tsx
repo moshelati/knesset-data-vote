@@ -4,6 +4,7 @@ import { apiFetch } from "@/lib/api";
 import { BillStatusBadge } from "@/components/shared/BillStatusBadge";
 import { SourceBadge } from "@/components/shared/SourceBadge";
 import { DemoBanner } from "@/components/shared/DemoBanner";
+import { AdSlot } from "@/components/shared/AdSlot";
 import { formatDateShort } from "@/lib/utils";
 import { BILL_TOPIC_LABELS, BILL_TOPIC_LABELS_HE } from "@knesset-vote/shared";
 import type { Bill } from "@knesset-vote/shared";
@@ -130,6 +131,7 @@ export default async function BillsPage({
         </div>
       ) : (
         <>
+          <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_LIST} className="mb-4" />
           <div className="space-y-3">
             {bills.map((bill) => (
               <Link

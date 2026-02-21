@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { BillStatusBadge } from "@/components/shared/BillStatusBadge";
+import { AdSlot } from "@/components/shared/AdSlot";
 import type { MK, Bill, Party } from "@knesset-vote/shared";
 
 export const metadata: Metadata = {
@@ -69,6 +70,11 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
           </button>
         </form>
       </div>
+
+      {/* Ad above results */}
+      {searched && hasResults && (
+        <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SEARCH} className="mb-2" />
+      )}
 
       {/* Results */}
       {!searched ? (

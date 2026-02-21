@@ -34,6 +34,7 @@ export async function Footer() {
                 { href: "/mks", label: "חברי כנסת" },
                 { href: "/bills", label: "הצעות חוק" },
                 { href: "/methodology", label: "מתודולוגיה ומגבלות" },
+                { href: "/privacy", label: "מדיניות פרטיות" },
               ].map(({ href, label }) => (
                 <li key={href}>
                   <Link href={href} className="hover:text-brand-700 text-sm text-neutral-600">

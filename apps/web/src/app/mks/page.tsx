@@ -3,6 +3,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { SourceBadge } from "@/components/shared/SourceBadge";
 import { DemoBanner } from "@/components/shared/DemoBanner";
+import { AdSlot } from "@/components/shared/AdSlot";
 import type { MK } from "@knesset-vote/shared";
 
 export const metadata: Metadata = {
@@ -92,47 +93,50 @@ export default async function MKsPage({
           </p>
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {mks.map((mk) => (
-            <Link
-              key={mk.id}
-              href={`/mks/${mk.id}`}
-              className="card group flex items-center gap-3 p-4 transition-shadow hover:shadow-md"
-              aria-label={`פרופיל של ${mk.name_he}`}
-            >
-              {/* Avatar placeholder */}
-              <div
-                className="bg-brand-100 text-brand-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-                aria-hidden="true"
+        <>
+          <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_LIST} className="mb-4" />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {mks.map((mk) => (
+              <Link
+                key={mk.id}
+                href={`/mks/${mk.id}`}
+                className="card group flex items-center gap-3 p-4 transition-shadow hover:shadow-md"
+                aria-label={`פרופיל של ${mk.name_he}`}
               >
-                {mk.name_he.charAt(0)}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="group-hover:text-brand-700 truncate font-medium text-neutral-900">
-                  {mk.name_he}
-                </p>
-                {mk.current_party_name && (
-                  <p className="truncate text-xs text-neutral-500">{mk.current_party_name}</p>
-                )}
-                <div className="mt-1 flex flex-wrap items-center gap-1">
-                  {(mk as MK & { coalition_status?: string | null }).coalition_status ===
-                    "coalition" && (
-                    <span className="badge bg-blue-50 px-1.5 py-0.5 text-xs text-blue-700">
-                      קואליציה
-                    </span>
-                  )}
-                  {(mk as MK & { coalition_status?: string | null }).coalition_status ===
-                    "opposition" && (
-                    <span className="badge bg-orange-50 px-1.5 py-0.5 text-xs text-orange-700">
-                      אופוזיציה
-                    </span>
-                  )}
-                  <SourceBadge sources={mk.sources} compact />
+                {/* Avatar placeholder */}
+                <div
+                  className="bg-brand-100 text-brand-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                  aria-hidden="true"
+                >
+                  {mk.name_he.charAt(0)}
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+                <div className="min-w-0 flex-1">
+                  <p className="group-hover:text-brand-700 truncate font-medium text-neutral-900">
+                    {mk.name_he}
+                  </p>
+                  {mk.current_party_name && (
+                    <p className="truncate text-xs text-neutral-500">{mk.current_party_name}</p>
+                  )}
+                  <div className="mt-1 flex flex-wrap items-center gap-1">
+                    {(mk as MK & { coalition_status?: string | null }).coalition_status ===
+                      "coalition" && (
+                      <span className="badge bg-blue-50 px-1.5 py-0.5 text-xs text-blue-700">
+                        קואליציה
+                      </span>
+                    )}
+                    {(mk as MK & { coalition_status?: string | null }).coalition_status ===
+                      "opposition" && (
+                      <span className="badge bg-orange-50 px-1.5 py-0.5 text-xs text-orange-700">
+                        אופוזיציה
+                      </span>
+                    )}
+                    <SourceBadge sources={mk.sources} compact />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
