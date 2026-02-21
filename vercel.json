@@ -3,5 +3,5 @@
   "buildCommand": "bash apps/web/scripts/vercel-build.sh",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web packages/shared packages/db"
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web packages/shared packages/db packages/etl"
 }
