@@ -44,8 +44,11 @@ export default async function PartiesPage({
   // filter by bloc if needed
   const parties = bloc
     ? allParties.filter((p) =>
-        bloc === "coalition" ? p.coalition_status === "coalition" :
-        bloc === "opposition" ? p.coalition_status === "opposition" : true
+        bloc === "coalition"
+          ? p.coalition_status === "coalition"
+          : bloc === "opposition"
+            ? p.coalition_status === "opposition"
+            : true,
       )
     : allParties;
 
@@ -65,7 +68,9 @@ export default async function PartiesPage({
       {/* Search + filters */}
       <form className="mb-6 flex flex-wrap gap-2" method="get">
         <input type="hidden" name="knesset" value={knesset} />
-        <label htmlFor="party-search" className="sr-only">חיפוש סיעה</label>
+        <label htmlFor="party-search" className="sr-only">
+          חיפוש סיעה
+        </label>
         <input
           id="party-search"
           type="text"
@@ -90,7 +95,10 @@ export default async function PartiesPage({
           סנן
         </button>
         {(search || bloc) && (
-          <Link href="/parties" className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+          <Link
+            href="/parties"
+            className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+          >
             נקה
           </Link>
         )}
@@ -117,7 +125,7 @@ export default async function PartiesPage({
             >
               <div className="mb-3 flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <h2 className="group-hover:text-brand-700 text-lg font-semibold text-neutral-900 leading-tight">
+                  <h2 className="group-hover:text-brand-700 text-lg font-semibold leading-tight text-neutral-900">
                     {party.name_he}
                   </h2>
                   {party.name_en && <p className="text-sm text-neutral-500">{party.name_en}</p>}

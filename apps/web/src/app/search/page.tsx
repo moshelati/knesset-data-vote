@@ -32,11 +32,7 @@ async function search(q: string): Promise<SearchResults> {
   };
 }
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: { q?: string };
-}) {
+export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
   const q = searchParams.q?.trim() ?? "";
   const results = await search(q);
   const hasResults =
@@ -51,14 +47,17 @@ export default async function SearchPage({
         {/* Search form */}
         <form method="get" className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" aria-hidden="true" />
+            <Search
+              className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400"
+              aria-hidden="true"
+            />
             <input
               type="text"
               name="q"
               defaultValue={q}
               placeholder="חפשו חבר כנסת, סיעה, או הצעת חוק..."
               autoFocus
-              className="focus:border-brand-500 w-full rounded-lg border border-neutral-300 py-3 pr-10 pl-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-200"
+              className="focus:border-brand-500 focus:ring-brand-200 w-full rounded-lg border border-neutral-300 py-3 pl-4 pr-10 text-base focus:outline-none focus:ring-2"
               aria-label="חיפוש"
             />
           </div>
@@ -92,7 +91,7 @@ export default async function SearchPage({
                   <Link
                     key={mk.id}
                     href={`/mks/${mk.id}`}
-                    className="card flex items-center gap-3 p-4 hover:shadow-md transition-shadow"
+                    className="card flex items-center gap-3 p-4 transition-shadow hover:shadow-md"
                   >
                     <div className="bg-brand-100 text-brand-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                       {mk.name_he.charAt(0)}
@@ -106,7 +105,10 @@ export default async function SearchPage({
                   </Link>
                 ))}
               </div>
-              <Link href={`/mks?search=${encodeURIComponent(q)}`} className="text-brand-600 mt-2 inline-block text-sm hover:underline">
+              <Link
+                href={`/mks?search=${encodeURIComponent(q)}`}
+                className="text-brand-600 mt-2 inline-block text-sm hover:underline"
+              >
                 כל התוצאות ב-חברי כנסת ←
               </Link>
             </section>
@@ -123,7 +125,7 @@ export default async function SearchPage({
                   <Link
                     key={party.id}
                     href={`/parties/${party.id}`}
-                    className="card flex items-center gap-3 p-4 hover:shadow-md transition-shadow"
+                    className="card flex items-center gap-3 p-4 transition-shadow hover:shadow-md"
                   >
                     <div className="bg-brand-100 text-brand-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg">
                       🏛
@@ -137,7 +139,10 @@ export default async function SearchPage({
                   </Link>
                 ))}
               </div>
-              <Link href={`/parties?search=${encodeURIComponent(q)}`} className="text-brand-600 mt-2 inline-block text-sm hover:underline">
+              <Link
+                href={`/parties?search=${encodeURIComponent(q)}`}
+                className="text-brand-600 mt-2 inline-block text-sm hover:underline"
+              >
                 כל התוצאות ב-סיעות ←
               </Link>
             </section>
@@ -154,7 +159,7 @@ export default async function SearchPage({
                   <Link
                     key={bill.id}
                     href={`/bills/${bill.id}`}
-                    className="card block p-4 hover:shadow-md transition-shadow"
+                    className="card block p-4 transition-shadow hover:shadow-md"
                   >
                     <p className="font-medium text-neutral-900">{bill.title_he}</p>
                     <div className="mt-1 flex items-center gap-2">
@@ -166,7 +171,10 @@ export default async function SearchPage({
                   </Link>
                 ))}
               </div>
-              <Link href={`/bills?search=${encodeURIComponent(q)}`} className="text-brand-600 mt-2 inline-block text-sm hover:underline">
+              <Link
+                href={`/bills?search=${encodeURIComponent(q)}`}
+                className="text-brand-600 mt-2 inline-block text-sm hover:underline"
+              >
                 כל התוצאות ב-הצעות חוק ←
               </Link>
             </section>

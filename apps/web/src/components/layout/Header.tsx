@@ -87,9 +87,7 @@ export function Header() {
                 key={href}
                 href={href}
                 className={`rounded-lg px-3 py-3 text-sm font-medium ${
-                  bold
-                    ? "text-brand-700 font-semibold"
-                    : "text-neutral-700 hover:bg-neutral-50"
+                  bold ? "text-brand-700 font-semibold" : "text-neutral-700 hover:bg-neutral-50"
                 }`}
                 onClick={() => setMenuOpen(false)}
               >

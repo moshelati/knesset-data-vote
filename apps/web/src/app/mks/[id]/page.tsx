@@ -272,7 +272,11 @@ export default async function MKPage({ params }: { params: { id: string } }) {
                     {r.start_date && (
                       <span className="text-purple-600">
                         · {formatDateShort(r.start_date)}
-                        {r.end_date ? ` – ${formatDateShort(r.end_date)}` : r.is_current ? " – היום" : ""}
+                        {r.end_date
+                          ? ` – ${formatDateShort(r.end_date)}`
+                          : r.is_current
+                            ? " – היום"
+                            : ""}
                       </span>
                     )}
                     {r.is_current && (

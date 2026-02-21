@@ -7,7 +7,7 @@ const SPECIAL_POSITION_LABELS: Record<number, string> = {
   57: "שרה",
   40: "סגן שר",
   59: "סגנית שר",
-  45: 'ראש הממשלה',
+  45: "ראש הממשלה",
   51: 'מ"מ ראש הממשלה',
   50: "סגן ראש הממשלה",
   41: 'יו"ר ועדה',
@@ -19,10 +19,8 @@ const SPECIAL_POSITION_IDS = Object.keys(SPECIAL_POSITION_LABELS).join(",");
 
 async function fetchSpecialRoles(externalId: string): Promise<MKSpecialRole[]> {
   const base =
-    process.env["KNESSET_ODATA_BASE_URL"] ??
-    "https://knesset.gov.il/OdataV4/ParliamentInfo";
-  const url =
-    `${base}/KNS_PersonToPosition?$filter=PersonID eq ${externalId} and PositionID in (${SPECIAL_POSITION_IDS})&$orderby=IsCurrent desc,KnessetNum desc&$top=200`;
+    process.env["KNESSET_ODATA_BASE_URL"] ?? "https://knesset.gov.il/OdataV4/ParliamentInfo";
+  const url = `${base}/KNS_PersonToPosition?$filter=PersonID eq ${externalId} and PositionID in (${SPECIAL_POSITION_IDS})&$orderby=IsCurrent desc,KnessetNum desc&$top=200`;
   try {
     const res = await fetch(url, {
       headers: { Accept: "application/json" },

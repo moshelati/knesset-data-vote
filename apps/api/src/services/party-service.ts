@@ -24,7 +24,10 @@ const KNESSET_25_OPPOSITION = new Set([
   "1098", // הציונות הדתית (אופוזיציה)
 ]);
 
-function getCoalitionStatus(externalId: string | null, knessetNumber: number | null): "coalition" | "opposition" | null {
+function getCoalitionStatus(
+  externalId: string | null,
+  knessetNumber: number | null,
+): "coalition" | "opposition" | null {
   if (knessetNumber !== 25 || !externalId) return null;
   if (KNESSET_25_COALITION.has(externalId)) return "coalition";
   if (KNESSET_25_OPPOSITION.has(externalId)) return "opposition";
