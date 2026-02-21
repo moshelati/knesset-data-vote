@@ -158,11 +158,9 @@ export function GlobalSearch() {
           onFocus={() => {
             if (results.length > 0) setOpen(true);
           }}
-          placeholder="חפש ח\"כ, סיעה, הצעת חוק..."
+          placeholder={'חפש ח"כ, סיעה, הצעת חוק...'}
           className="w-full min-w-0 bg-transparent text-sm text-neutral-700 placeholder-neutral-400 focus:outline-none"
           aria-label="חיפוש כללי"
-          aria-expanded={open}
-          aria-haspopup="listbox"
           aria-autocomplete="list"
           autoComplete="off"
         />
