@@ -67,6 +67,15 @@ export const MKProfileSchema = z.object({
   first_elected: z.string().datetime().nullable(),
 });
 
+export const MKSpecialRoleSchema = z.object({
+  position_id: z.number(),
+  position_label_he: z.string(),
+  knesset_number: z.number().int().nullable(),
+  start_date: z.string().datetime().nullable(),
+  end_date: z.string().datetime().nullable(),
+  is_current: z.boolean(),
+});
+
 export const MKDetailSchema = MKSchema.extend({
   memberships: z.array(MKMembershipSchema),
   activity_metrics: MKActivityMetricsSchema,
@@ -84,6 +93,7 @@ export const MKDetailSchema = MKSchema.extend({
   topic_breakdown: z.array(MKTopicBreakdownItemSchema),
   committee_list: z.array(MKCommitteeListItemSchema),
   profile: MKProfileSchema,
+  special_roles: z.array(MKSpecialRoleSchema).optional().default([]),
 });
 
 export type MK = z.infer<typeof MKSchema>;
@@ -92,4 +102,5 @@ export type MKActivityMetrics = z.infer<typeof MKActivityMetricsSchema>;
 export type MKTopicBreakdownItem = z.infer<typeof MKTopicBreakdownItemSchema>;
 export type MKCommitteeListItem = z.infer<typeof MKCommitteeListItemSchema>;
 export type MKProfile = z.infer<typeof MKProfileSchema>;
+export type MKSpecialRole = z.infer<typeof MKSpecialRoleSchema>;
 export type MKDetail = z.infer<typeof MKDetailSchema>;

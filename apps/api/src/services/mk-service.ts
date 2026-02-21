@@ -1,6 +1,61 @@
 import { db } from "@knesset-vote/db";
-import type { MK, MKDetail } from "@knesset-vote/shared";
+import type { MK, MKDetail, MKSpecialRole } from "@knesset-vote/shared";
 import { BILL_TOPIC_LABELS_HE } from "@knesset-vote/shared";
+
+const SPECIAL_POSITION_LABELS: Record<number, string> = {
+  39: "שר",
+  57: "שרה",
+  40: "סגן שר",
+  59: "סגנית שר",
+  45: 'ראש הממשלה',
+  51: 'מ"מ ראש הממשלה',
+  50: "סגן ראש הממשלה",
+  41: 'יו"ר ועדה',
+  61: 'יו"ר ועדה',
+  30: "יושב-ראש הקואליציה",
+  29: "יושבת-ראש הקואליציה",
+};
+const SPECIAL_POSITION_IDS = Object.keys(SPECIAL_POSITION_LABELS).join(",");
+
+async function fetchSpecialRoles(externalId: string): Promise<MKSpecialRole[]> {
+  const base =
+    process.env["KNESSET_ODATA_BASE_URL"] ??
+    "https://knesset.gov.il/OdataV4/ParliamentInfo";
+  const url =
+    `${base}/KNS_PersonToPosition?$filter=PersonID eq ${externalId} and PositionID in (${SPECIAL_POSITION_IDS})&$top=50`;
+  try {
+    const res = await fetch(url, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return [];
+    const json = (await res.json()) as {
+      value?: {
+        PositionID: number;
+        KnessetNum: number | null;
+        StartDate: string | null;
+        FinishDate: string | null;
+        IsCurrent: boolean;
+      }[];
+    };
+    const rows = json.value ?? [];
+    const now = new Date();
+    return rows.map((row) => {
+      const endDate = row.FinishDate ? new Date(row.FinishDate) : null;
+      const isCurrent = row.IsCurrent ?? (endDate === null || endDate > now);
+      return {
+        position_id: row.PositionID,
+        position_label_he: SPECIAL_POSITION_LABELS[row.PositionID] ?? String(row.PositionID),
+        knesset_number: row.KnessetNum ?? null,
+        start_date: row.StartDate ?? null,
+        end_date: row.FinishDate ?? null,
+        is_current: isCurrent,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
 
 async function getSourceLinks(entityType: string, entityId: string) {
   return db.sourceLink.findMany({
@@ -160,6 +215,7 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
     billsPassed,
     voteCount,
     topicRows,
+    specialRoles,
   ] = await Promise.all([
     getSourceLinks("mk", mk.id),
     // Fetch source links for all memberships in parallel
@@ -184,6 +240,7 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
         ORDER BY bill_count DESC
         LIMIT 10
       `,
+    fetchSpecialRoles(mk.external_id),
   ]);
 
   const lastSyncAt = await db.eTLRun.findFirst({
@@ -285,5 +342,6 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
       knesset_terms: knessetTerms,
       first_elected: firstElected?.toISOString() ?? null,
     },
+    special_roles: specialRoles,
   };
 }

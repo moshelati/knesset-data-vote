@@ -5,7 +5,7 @@ import { BillStatusBadge } from "@/components/shared/BillStatusBadge";
 import { SourceBadge } from "@/components/shared/SourceBadge";
 import { DemoBanner } from "@/components/shared/DemoBanner";
 import { formatDateShort } from "@/lib/utils";
-import { BILL_TOPIC_LABELS } from "@knesset-vote/shared";
+import { BILL_TOPIC_LABELS, BILL_TOPIC_LABELS_HE } from "@knesset-vote/shared";
 import type { Bill } from "@knesset-vote/shared";
 
 export const metadata: Metadata = {
@@ -75,19 +75,6 @@ export default async function BillsPage({
           aria-label="חיפוש הצעת חוק"
         />
         <select
-          name="topic"
-          defaultValue={topic ?? ""}
-          className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:outline-none"
-          aria-label="בחר נושא"
-        >
-          <option value="">כל הנושאים</option>
-          {Object.entries(BILL_TOPIC_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <select
           name="status"
           defaultValue={status ?? ""}
           className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:outline-none"
@@ -99,6 +86,21 @@ export default async function BillsPage({
           <option value="first_reading">קריאה ראשונה</option>
           <option value="passed">אושרה</option>
           <option value="rejected">נדחתה</option>
+        </select>
+        <select
+          name="topic"
+          defaultValue={topic ?? ""}
+          className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:outline-none"
+          aria-label="בחר נושא"
+        >
+          <option value="">כל הנושאים</option>
+          {Object.entries(BILL_TOPIC_LABELS_HE)
+            .filter(([value]) => value !== "other")
+            .map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
         </select>
         <button
           type="submit"

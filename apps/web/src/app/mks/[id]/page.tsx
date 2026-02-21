@@ -85,6 +85,17 @@ export default async function MKPage({ params }: { params: { id: string } }) {
                     {mk.profile.gender_label_he}
                   </span>
                 )}
+                {mk.special_roles &&
+                  mk.special_roles
+                    .filter((r) => r.is_current)
+                    .map((r) => (
+                      <span
+                        key={r.position_id}
+                        className="badge bg-purple-100 px-2 py-1 text-purple-800"
+                      >
+                        {r.position_label_he}
+                      </span>
+                    ))}
                 {mk.profile?.knesset_terms && mk.profile.knesset_terms.length > 0 && (
                   <span className="badge bg-brand-50 text-brand-700 px-2 py-1">
                     {mk.profile.knesset_terms.length} כנסות
@@ -248,6 +259,35 @@ export default async function MKPage({ params }: { params: { id: string } }) {
             name_he={mk.name_he}
             is_current={mk.is_current}
           />
+          {mk.special_roles && mk.special_roles.length > 0 && (
+            <div className="mt-4 rounded-lg border border-purple-200 bg-purple-50 p-5">
+              <h3 className="mb-3 text-sm font-semibold text-purple-900">תפקידים מיוחדים</h3>
+              <ul className="space-y-2 text-sm text-purple-800">
+                {mk.special_roles.map((r, i) => (
+                  <li key={`${r.position_id}-${i}`} className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium">{r.position_label_he}</span>
+                    {r.knesset_number && (
+                      <span className="text-purple-600">· כנסת {r.knesset_number}</span>
+                    )}
+                    {r.start_date && (
+                      <span className="text-purple-600">
+                        · {formatDateShort(r.start_date)}
+                        {r.end_date ? ` – ${formatDateShort(r.end_date)}` : r.is_current ? " – היום" : ""}
+                      </span>
+                    )}
+                    {r.is_current && (
+                      <span className="badge bg-purple-100 px-1.5 py-0.5 text-xs text-purple-800">
+                        נוכחי
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 border-t border-purple-200 pt-2 text-xs text-purple-600">
+                מקור: Knesset OData KNS_PersonToPosition
+              </p>
+            </div>
+          )}
         </section>
       )}
 
