@@ -8,7 +8,8 @@
  * 4. Sync Bills + Sponsors + Stages
  * 5. Sync Committees + Memberships
  * 6. Sync Votes + VoteRecords (from separate votes.svc OData)
- * 7. Produce ETLRun report
+ * 7. Sync GovernmentRoles (Ministers + Deputy Ministers from KNS_PersonToPosition)
+ * 8. Produce ETLRun report
  */
 
 import { fetchODataMetadata, parseODataMetadataXmlAsync } from "../client/odata-metadata.js";
@@ -17,6 +18,7 @@ import { syncMKs } from "./sync-mks.js";
 import { syncBills } from "./sync-bills.js";
 import { syncCommittees } from "./sync-committees.js";
 import { syncVotes } from "./sync-votes.js";
+import { syncGovernmentRoles } from "./sync-government-roles.js";
 import { ETLRunTracker } from "./run-tracker.js";
 import { logger } from "../logger.js";
 import type { ETLRunResult, SyncOptions } from "@knesset-vote/shared";
@@ -67,6 +69,9 @@ export async function runSync(options: SyncOptions = {}): Promise<ETLRunResult> 
 
     // Step 6: Sync Votes + VoteRecords (separate votes.svc OData endpoint)
     await syncVotes(tracker, mkIdMap);
+
+    // Step 7: Sync GovernmentRoles (Ministers + Deputy Ministers)
+    await syncGovernmentRoles(tracker, mkIdMap);
 
     // Determine final status
     const summary = tracker.getSummary();

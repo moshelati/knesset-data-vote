@@ -41,6 +41,7 @@ export default async function MethodologyPage() {
             { href: "#data-sources", label: "מקורות נתונים" },
             { href: "#parties", label: "נתוני סיעות" },
             { href: "#mks", label: "נתוני חברי כנסת" },
+            { href: "#government-roles", label: "נתוני ממשלה ושרים" },
             { href: "#bills", label: "נתוני הצעות חוק" },
             { href: "#topic-classification", label: "סיווג נושאים" },
             { href: "#statements", label: "הצהרות ומחויבויות" },
@@ -220,6 +221,70 @@ export default async function MethodologyPage() {
             </div>
             <div>
               <strong>הצבעות:</strong> לפי VoteRecord אם הישות זמינה ב-OData. ייתכן שנתונים חסרים.
+            </div>
+          </div>
+        </section>
+
+        {/* Government Roles */}
+        <section id="government-roles" aria-labelledby="government-roles-heading">
+          <h2 id="government-roles-heading" className="text-2xl font-bold text-neutral-900">
+            נתוני ממשלה ושרים
+          </h2>
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
+            <div>
+              <strong>מקור:</strong> ישות{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">KNS_PersonToPosition</code>{" "}
+              מ-Knesset OData (גרסה v1:{" "}
+              <a
+                href="https://knesset.gov.il/Odata/ParliamentInfo.svc/KNS_PersonToPosition"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-600 hover:underline"
+              >
+                knesset.gov.il/Odata/ParliamentInfo.svc
+              </a>
+              ).
+            </div>
+            <div>
+              <strong>שדות בשימוש:</strong>{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">PositionID</code> (סינון
+              לתפקידים ממשלתיים),{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">GovMinistryName</code>,{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">DutyDesc</code>,{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">StartDate</code>,{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">FinishDate</code>,{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">IsCurrent</code>,{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">GovernmentNum</code>.
+            </div>
+            <div>
+              <strong>תפקידים מסוננים:</strong> שר (39), שרה (57), ראש הממשלה (45), משנה לרה&quot;מ
+              (31), סגן רה&quot;מ (50), סגן שר (40), סגנית שר (59), מ&quot;מ רה&quot;מ (51), סגן
+              שרה (285079).
+            </div>
+            <div>
+              <strong>מיפוי נושאים:</strong> מיפוי ידני (
+              <code className="rounded bg-neutral-100 px-1 font-mono">ministry-map.json</code>) בין{" "}
+              <code className="rounded bg-neutral-100 px-1 font-mono">GovMinistryID</code> לנושא
+              חקיקה (כלכלה, ביטחון, חינוך וכו&#39;). זהו מיפוי ידני שעשוי להכיל שגיאות.
+            </div>
+            <div className="rounded-md bg-amber-50 p-3 text-amber-800">
+              <strong>⚠ מגבלות חשובות:</strong>
+              <ul className="mt-1 list-inside list-disc space-y-1">
+                <li>
+                  <strong>הצעות חוק קשורות:</strong> מסוננות לפי נושא המשרד — לא ייחוס סיבתי ישיר
+                  לשר. השר לא בהכרח יזם את החוקים המוצגים.
+                </li>
+                <li>
+                  <strong>תמונות:</strong> ייתכן שתמונות חסרות — OData אינו מספק תמונות לכל שר.
+                </li>
+                <li>
+                  <strong>מיפוי משרדים לנושאים:</strong> ידני ועשוי שלא לשקף את כל תחומי פעילות
+                  המשרד.
+                </li>
+                <li>
+                  <strong>סגני שרים:</strong> כלולים אם רשומים ב-OData עם IsCurrent=true.
+                </li>
+              </ul>
             </div>
           </div>
         </section>

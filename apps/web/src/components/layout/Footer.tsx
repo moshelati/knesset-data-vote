@@ -32,6 +32,7 @@ export async function Footer() {
               {[
                 { href: "/parties", label: "סיעות" },
                 { href: "/mks", label: "חברי כנסת" },
+                { href: "/government", label: "ממשלה" },
                 { href: "/bills", label: "הצעות חוק" },
                 { href: "/methodology", label: "מתודולוגיה ומגבלות" },
                 { href: "/privacy", label: "מדיניות פרטיות" },

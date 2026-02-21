@@ -10,6 +10,7 @@ export function Header() {
   const navLinks = [
     { href: "/parties", label: "סיעות" },
     { href: "/mks", label: "חברי כנסת" },
+    { href: "/government", label: "ממשלה" },
     { href: "/bills", label: "הצעות חוק" },
     { href: "/votes", label: "הצבעות" },
     { href: "/my-election", label: "הבחירות שלי", bold: true },

@@ -7,6 +7,7 @@ export * from "./schemas/promise.js";
 export * from "./schemas/common.js";
 export * from "./schemas/api.js";
 export * from "./schemas/recommendation.js";
+export * from "./schemas/government.js";
 export * from "./types/index.js";
 export * from "./constants/index.js";
 export * from "./constants/my-election.js";

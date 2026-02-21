@@ -66,6 +66,7 @@ model MK {
   committee_memberships CommitteeMembership[]
   vote_records          VoteRecord[]
   promises              Promise[]
+  government_roles      GovernmentRole[]
 
   @@unique([external_id, external_source])
   @@index([name_he])
@@ -457,4 +458,41 @@ model PartyTopicAgg {
   @@unique([party_id, topic])
   @@index([party_id])
   @@index([topic])
+}
+
+// ─────────────────────────────────────────────
+// GOVERNMENT ROLES (Ministers + Deputy Ministers)
+// Source: KNS_PersonToPosition from Knesset OData
+// Filtered to minister position IDs: 39,57,45,31,50,40,59,51,285079
+// ─────────────────────────────────────────────
+model GovernmentRole {
+  id              String   @id @default(cuid())
+  external_id     String   // PersonToPositionID (stringified)
+  external_source String   @default("knesset_odata")
+  source_url      String?
+
+  mk_id           String
+  position_id     Int      // OData PositionID (39=שר, 57=שרה, 45=PM, etc.)
+  position_label  String   // e.g. "שר", "שרה", "ראש הממשלה"
+  gov_ministry_id Int?     // OData GovMinistryID
+  ministry_name   String?  // OData GovMinistryName (e.g. "משרד המשפטים")
+  duty_desc       String?  // OData DutyDesc (e.g. "שר המשפטים")
+  government_num  Int?     // 37 = current government
+  knesset_num     Int?
+
+  start_date      DateTime?
+  end_date        DateTime?
+  is_current      Boolean   @default(false)
+
+  last_seen_at    DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  mk              MK        @relation(fields: [mk_id], references: [id], onDelete: Cascade)
+
+  @@unique([external_id, external_source])
+  @@index([mk_id])
+  @@index([is_current])
+  @@index([gov_ministry_id])
+  @@index([government_num])
 }

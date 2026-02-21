@@ -15,6 +15,7 @@ import { searchRoutes } from "./routes/search.js";
 import { promiseRoutes } from "./routes/promises.js";
 import { voteRoutes } from "./routes/votes.js";
 import { recommendationRoutes } from "./routes/recommendations.js";
+import { governmentRoutes } from "./routes/government.js";
 import { RATE_LIMIT } from "@knesset-vote/shared";
 
 const PORT = Number(process.env["PORT"] ?? process.env["API_PORT"] ?? 3001);
@@ -104,6 +105,7 @@ async function build() {
           name: "Recommendations",
           description: "My Election — personalized party recommendations",
         },
+        { name: "Government", description: "Current government ministers and their roles" },
       ],
     },
   });
@@ -150,6 +152,7 @@ async function build() {
   await app.register(promiseRoutes);
   await app.register(voteRoutes);
   await app.register(recommendationRoutes);
+  await app.register(governmentRoutes);
 
   return app;
 }
