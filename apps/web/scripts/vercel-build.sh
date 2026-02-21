@@ -16,4 +16,4 @@ echo "→ Building db package"
 pnpm --filter @knesset-vote/db build
 
 echo "→ Building web"
-pnpm --filter @knesset-vote/web next build
+pnpm --filter @knesset-vote/web build
