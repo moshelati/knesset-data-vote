@@ -1,8 +1,10 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
+  # Disabled: Vercel deploys automatically via GitHub integration.
+  # Railway deploys automatically via its own GitHub integration.
+  # Re-enable and add VERCEL_TOKEN + RAILWAY_TOKEN secrets to use this workflow.
+  workflow_dispatch:
 
 concurrency:
   group: deploy-${{ github.ref }}
