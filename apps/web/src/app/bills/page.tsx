@@ -25,6 +25,7 @@ async function getBills(opts: {
   search?: string;
   topic?: string;
   status?: string;
+  page?: number;
 }): Promise<BillsResponse | null> {
   try {
     const params = new URLSearchParams();
@@ -32,6 +33,9 @@ async function getBills(opts: {
     if (opts.topic) params.set("topic", opts.topic);
     if (opts.status) params.set("status", opts.status);
     params.set("limit", "30");
+    params.set("sort", "submitted_date");
+    params.set("order", "desc");
+    if (opts.page && opts.page > 1) params.set("page", String(opts.page));
     return await apiFetch<BillsResponse>(`/api/bills?${params.toString()}`);
   } catch {
     return null;
@@ -41,10 +45,11 @@ async function getBills(opts: {
 export default async function BillsPage({
   searchParams,
 }: {
-  searchParams: { search?: string; topic?: string; status?: string };
+  searchParams: { search?: string; topic?: string; status?: string; page?: string };
 }) {
-  const { search, topic, status } = searchParams;
-  const response = await getBills({ search, topic, status });
+  const { search, topic, status, page } = searchParams;
+  const currentPage = Number(page ?? 1);
+  const response = await getBills({ search, topic, status, page: currentPage });
   const bills = response?.data ?? [];
   const hasDemo = bills.some((b) => (b as Bill & { is_demo?: boolean }).is_demo);
 
@@ -119,46 +124,73 @@ export default async function BillsPage({
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {bills.map((bill) => (
-            <Link
-              key={bill.id}
-              href={`/bills/${bill.id}`}
-              className="card group block p-5 transition-shadow hover:shadow-md"
-              aria-label={`עיין בהצעת החוק: ${bill.title_he}`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h2 className="group-hover:text-brand-700 font-semibold text-neutral-900">
-                    {bill.title_he}
-                  </h2>
-                  {bill.title_en && (
-                    <p className="mt-0.5 text-sm text-neutral-500">{bill.title_en}</p>
-                  )}
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <BillStatusBadge status={bill.status ?? "unknown"} />
-                    {bill.topic && bill.topic in BILL_TOPIC_LABELS && (
-                      <span className="badge bg-blue-50 text-blue-700">
-                        {BILL_TOPIC_LABELS[bill.topic as keyof typeof BILL_TOPIC_LABELS]}
-                      </span>
+        <>
+          <div className="space-y-3">
+            {bills.map((bill) => (
+              <Link
+                key={bill.id}
+                href={`/bills/${bill.id}`}
+                className="card group block p-5 transition-shadow hover:shadow-md"
+                aria-label={`עיין בהצעת החוק: ${bill.title_he}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h2 className="group-hover:text-brand-700 font-semibold text-neutral-900">
+                      {bill.title_he}
+                    </h2>
+                    {bill.title_en && (
+                      <p className="mt-0.5 text-sm text-neutral-500">{bill.title_en}</p>
                     )}
-                    {bill.knesset_number && (
-                      <span className="text-xs text-neutral-400">כנסת {bill.knesset_number}</span>
-                    )}
-                    {bill.submitted_date && (
-                      <span className="text-xs text-neutral-400">
-                        {formatDateShort(bill.submitted_date)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-2">
-                    <SourceBadge sources={bill.sources} compact />
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <BillStatusBadge status={bill.status ?? "unknown"} />
+                      {bill.topic && bill.topic in BILL_TOPIC_LABELS && (
+                        <span className="badge bg-blue-50 text-blue-700">
+                          {BILL_TOPIC_LABELS[bill.topic as keyof typeof BILL_TOPIC_LABELS]}
+                        </span>
+                      )}
+                      {bill.knesset_number && (
+                        <span className="text-xs text-neutral-400">כנסת {bill.knesset_number}</span>
+                      )}
+                      {bill.submitted_date && (
+                        <span className="text-xs text-neutral-400">
+                          {formatDateShort(bill.submitted_date)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2">
+                      <SourceBadge sources={bill.sources} compact />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {response && response.pages > 1 && (
+            <div className="mt-6 flex items-center justify-center gap-3">
+              {currentPage > 1 && (
+                <Link
+                  href={`/bills?${new URLSearchParams({ ...(search ? { search } : {}), ...(topic ? { topic } : {}), ...(status ? { status } : {}), page: String(currentPage - 1) })}`}
+                  className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  ← הקודם
+                </Link>
+              )}
+              <span className="text-sm text-neutral-500">
+                עמוד {currentPage} מתוך {response.pages}
+              </span>
+              {currentPage < response.pages && (
+                <Link
+                  href={`/bills?${new URLSearchParams({ ...(search ? { search } : {}), ...(topic ? { topic } : {}), ...(status ? { status } : {}), page: String(currentPage + 1) })}`}
+                  className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  הבא →
+                </Link>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

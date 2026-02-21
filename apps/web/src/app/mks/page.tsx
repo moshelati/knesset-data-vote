@@ -23,8 +23,9 @@ async function getMKs(opts: { search?: string; party_id?: string }): Promise<MKs
     const params = new URLSearchParams();
     if (opts.search) params.set("search", opts.search);
     if (opts.party_id) params.set("party_id", opts.party_id);
-    params.set("limit", "50");
+    params.set("limit", "120");
     params.set("is_current", "true");
+    params.set("knesset_number", "25");
     return await apiFetch<MKsResponse>(`/api/mks?${params.toString()}`);
   } catch {
     return null;
