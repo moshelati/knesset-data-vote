@@ -151,7 +151,10 @@ export async function listMKs(opts: {
       orderBy: [{ name_last_he: "asc" }, { name_he: "asc" }],
       include: {
         memberships: {
-          where: { is_current: true },
+          // Fetch most recent membership regardless of is_current flag,
+          // because some active MKs (e.g. ministers) may have is_current=false
+          // in the membership table due to OData quirks.
+          orderBy: [{ is_current: "desc" }, { start_date: "desc" }],
           include: {
             party: {
               select: {
@@ -246,7 +249,9 @@ export async function getMKById(id: string): Promise<MKDetail | null> {
 
   if (!mk) return null;
 
-  const currentMembership = mk.memberships.find((m) => m.is_current);
+  // Prefer is_current=true membership; fall back to most recent (ordered desc)
+  // because some active MKs (ministers) may have is_current=false in OData.
+  const currentMembership = mk.memberships.find((m) => m.is_current) ?? mk.memberships[0];
 
   const [
     mkSources,
