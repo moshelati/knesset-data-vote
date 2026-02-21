@@ -22,7 +22,7 @@ async function fetchSpecialRoles(externalId: string): Promise<MKSpecialRole[]> {
     process.env["KNESSET_ODATA_BASE_URL"] ??
     "https://knesset.gov.il/OdataV4/ParliamentInfo";
   const url =
-    `${base}/KNS_PersonToPosition?$filter=PersonID eq ${externalId} and PositionID in (${SPECIAL_POSITION_IDS})&$top=50`;
+    `${base}/KNS_PersonToPosition?$filter=PersonID eq ${externalId} and PositionID in (${SPECIAL_POSITION_IDS})&$orderby=IsCurrent desc,KnessetNum desc&$top=200`;
   try {
     const res = await fetch(url, {
       headers: { Accept: "application/json" },
@@ -40,18 +40,24 @@ async function fetchSpecialRoles(externalId: string): Promise<MKSpecialRole[]> {
     };
     const rows = json.value ?? [];
     const now = new Date();
-    return rows.map((row) => {
+    // Deduplicate: keep first occurrence per PositionID (ordered current-first from OData)
+    const seen = new Set<number>();
+    const mapped: MKSpecialRole[] = [];
+    for (const row of rows) {
+      if (seen.has(row.PositionID)) continue;
+      seen.add(row.PositionID);
       const endDate = row.FinishDate ? new Date(row.FinishDate) : null;
       const isCurrent = row.IsCurrent ?? (endDate === null || endDate > now);
-      return {
+      mapped.push({
         position_id: row.PositionID,
         position_label_he: SPECIAL_POSITION_LABELS[row.PositionID] ?? String(row.PositionID),
         knesset_number: row.KnessetNum ?? null,
         start_date: row.StartDate ?? null,
         end_date: row.FinishDate ?? null,
         is_current: isCurrent,
-      };
-    });
+      });
+    }
+    return mapped;
   } catch {
     return [];
   }
