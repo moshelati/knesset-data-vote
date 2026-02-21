@@ -38,10 +38,11 @@ async function fetchVotesNextLink<T>(url: string): Promise<ODataPage<T>> {
   return res.json() as Promise<ODataPage<T>>;
 }
 
-async function* fetchAllVotePages<T>(entity: string): AsyncGenerator<T[]> {
+async function* fetchAllVotePages<T>(entity: string): AsyncGenerator<T[], void, unknown> {
   let nextUrl: string | undefined = `${VOTES_V4_BASE}/${entity}`;
-  while (nextUrl) {
-    const page = await fetchVotesNextLink<T>(nextUrl);
+  while (nextUrl !== undefined) {
+    const currentUrl: string = nextUrl;
+    const page = await fetchVotesNextLink<T>(currentUrl);
     if (!page.value || page.value.length === 0) break;
     yield page.value;
     nextUrl = page["@odata.nextLink"];
