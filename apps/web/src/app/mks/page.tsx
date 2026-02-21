@@ -23,7 +23,7 @@ async function getMKs(opts: { search?: string; party_id?: string }): Promise<MKs
     const params = new URLSearchParams();
     if (opts.search) params.set("search", opts.search);
     if (opts.party_id) params.set("party_id", opts.party_id);
-    params.set("limit", "120");
+    params.set("limit", "200");
     params.set("is_current", "true");
     params.set("knesset_number", "25");
     return await apiFetch<MKsResponse>(`/api/mks?${params.toString()}`);
@@ -47,7 +47,7 @@ export default async function MKsPage({
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-neutral-900">חברי הכנסת</h1>
         <p className="mt-2 text-neutral-600">
-          {response?.total ?? 0} חברי כנסת • נתונים מ-Knesset OData
+          {mks.length} חברי כנסת נוכחיים • כנסת 25 • נתונים מ-Knesset OData
         </p>
       </div>
 
