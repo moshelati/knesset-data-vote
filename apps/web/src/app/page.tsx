@@ -49,7 +49,7 @@ export default async function HomePage() {
           </p>
 
           {/* Search */}
-          <form action="/api/search" method="get" className="mx-auto max-w-2xl">
+          <form action="/search" method="get" className="mx-auto max-w-2xl">
             <div className="flex rounded-xl bg-white shadow-lg">
               <label htmlFor="search-input" className="sr-only">
                 חיפוש חבר כנסת, סיעה או הצעת חוק

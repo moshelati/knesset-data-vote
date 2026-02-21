@@ -84,8 +84,11 @@ export default async function BillsPage({
           <option value="submitted">הוגשה</option>
           <option value="committee_review">בוועדה</option>
           <option value="first_reading">קריאה ראשונה</option>
+          <option value="second_reading">קריאה שנייה</option>
+          <option value="third_reading">קריאה שלישית</option>
           <option value="passed">אושרה</option>
           <option value="rejected">נדחתה</option>
+          <option value="withdrawn">נמשכה</option>
         </select>
         <select
           name="topic"

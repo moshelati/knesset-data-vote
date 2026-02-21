@@ -2,6 +2,29 @@ import { db } from "@knesset-vote/db";
 import type { MK, MKDetail, MKSpecialRole } from "@knesset-vote/shared";
 import { BILL_TOPIC_LABELS_HE } from "@knesset-vote/shared";
 
+// כנסת 25 — קואליציה/אופוזיציה לפי external_id של הסיעה
+const KNESSET_25_COALITION = new Set(["1096", "1105", "1102", "1104", "1108", "1106", "1107"]);
+const KNESSET_25_OPPOSITION = new Set([
+  "1097",
+  "1099",
+  "1101",
+  "1100",
+  "1103",
+  "1109",
+  "1110",
+  "1098",
+]);
+
+function getMKCoalitionStatus(
+  partyExternalId: string | null,
+  knessetNumber: number | null,
+): "coalition" | "opposition" | null {
+  if (knessetNumber !== 25 || !partyExternalId) return null;
+  if (KNESSET_25_COALITION.has(partyExternalId)) return "coalition";
+  if (KNESSET_25_OPPOSITION.has(partyExternalId)) return "opposition";
+  return null;
+}
+
 const SPECIAL_POSITION_LABELS: Record<number, string> = {
   39: "שר",
   57: "שרה",
@@ -129,7 +152,17 @@ export async function listMKs(opts: {
       include: {
         memberships: {
           where: { is_current: true },
-          include: { party: { select: { id: true, name_he: true, name_en: true } } },
+          include: {
+            party: {
+              select: {
+                id: true,
+                name_he: true,
+                name_en: true,
+                external_id: true,
+                knesset_number: true,
+              },
+            },
+          },
           take: 1,
         },
       },
@@ -159,6 +192,10 @@ export async function listMKs(opts: {
         is_current: mk.is_current,
         current_party_id: currentMembership?.party.id ?? null,
         current_party_name: currentMembership?.party.name_he ?? null,
+        coalition_status: getMKCoalitionStatus(
+          currentMembership?.party.external_id ?? null,
+          currentMembership?.party.knesset_number ?? null,
+        ),
         source_url: mk.source_url,
         image_url: mk.image_url,
         last_seen_at: mk.last_seen_at?.toISOString() ?? null,

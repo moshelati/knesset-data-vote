@@ -114,7 +114,19 @@ export default async function MKsPage({
                 {mk.current_party_name && (
                   <p className="truncate text-xs text-neutral-500">{mk.current_party_name}</p>
                 )}
-                <div className="mt-1">
+                <div className="mt-1 flex flex-wrap items-center gap-1">
+                  {(mk as MK & { coalition_status?: string | null }).coalition_status ===
+                    "coalition" && (
+                    <span className="badge bg-blue-50 px-1.5 py-0.5 text-xs text-blue-700">
+                      קואליציה
+                    </span>
+                  )}
+                  {(mk as MK & { coalition_status?: string | null }).coalition_status ===
+                    "opposition" && (
+                    <span className="badge bg-orange-50 px-1.5 py-0.5 text-xs text-orange-700">
+                      אופוזיציה
+                    </span>
+                  )}
                   <SourceBadge sources={mk.sources} compact />
                 </div>
               </div>

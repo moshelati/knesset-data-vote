@@ -13,6 +13,7 @@ export const MKSchema = z.object({
   is_current: z.boolean(),
   current_party_id: z.string().nullable(),
   current_party_name: z.string().nullable(),
+  coalition_status: z.enum(["coalition", "opposition"]).nullable().optional(),
   source_url: z.string().url().nullable(),
   image_url: z.string().url().nullable(),
   last_seen_at: z.string().datetime().nullable(),

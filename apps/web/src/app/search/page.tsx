@@ -20,7 +20,7 @@ async function search(q: string): Promise<SearchResults> {
   if (!q || q.trim().length < 2) return { mks: [], parties: [], bills: [] };
 
   const [mksRes, partiesRes, billsRes] = await Promise.allSettled([
-    apiFetch<{ data: MK[] }>(`/api/mks?search=${encodeURIComponent(q)}&limit=5&is_current=false`),
+    apiFetch<{ data: MK[] }>(`/api/mks?search=${encodeURIComponent(q)}&limit=5`),
     apiFetch<{ data: Party[] }>(`/api/parties?search=${encodeURIComponent(q)}&limit=5`),
     apiFetch<{ data: Bill[] }>(`/api/bills?search=${encodeURIComponent(q)}&limit=5`),
   ]);
