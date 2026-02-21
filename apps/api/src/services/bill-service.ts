@@ -53,7 +53,7 @@ export async function listBills(opts: {
       where,
       skip,
       take: limit,
-      orderBy: [{ submitted_date: "desc" }, { title_he: "asc" }],
+      orderBy: [{ last_status_date: "desc" }, { submitted_date: "desc" }, { title_he: "asc" }],
     }),
     db.bill.count({ where }),
   ]);

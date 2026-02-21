@@ -1,6 +1,36 @@
 import { db } from "@knesset-vote/db";
 import type { Party, PartyDetail } from "@knesset-vote/shared";
 
+// כנסת 25 — קואליציה/אופוזיציה לפי external_id (KNS_Faction ID)
+// מקור: הכרזות ממשלה רשמיות
+const KNESSET_25_COALITION = new Set([
+  "1096", // הליכוד
+  "1105", // ש"ס
+  "1102", // יהדות התורה
+  "1104", // הציונות הדתית
+  "1108", // הימין הממלכתי
+  "1106", // עוצמה יהודית
+  "1107", // נועם
+]);
+
+const KNESSET_25_OPPOSITION = new Set([
+  "1097", // יש עתיד
+  "1099", // המחנה הממלכתי
+  "1101", // העבודה
+  "1100", // ישראל ביתנו
+  "1103", // חד"ש-תע"ל
+  "1109", // רע"ם
+  "1110", // מרצ
+  "1098", // הציונות הדתית (אופוזיציה)
+]);
+
+function getCoalitionStatus(externalId: string | null, knessetNumber: number | null): "coalition" | "opposition" | null {
+  if (knessetNumber !== 25 || !externalId) return null;
+  if (KNESSET_25_COALITION.has(externalId)) return "coalition";
+  if (KNESSET_25_OPPOSITION.has(externalId)) return "opposition";
+  return null;
+}
+
 async function getSourceLinks(entityType: string, entityId: string) {
   return db.sourceLink.findMany({
     where: { entity_type: entityType, entity_id: entityId },
@@ -62,6 +92,7 @@ export async function listParties(opts: {
       knesset_number: p.knesset_number,
       seat_count: p.seat_count,
       is_active: p.is_active,
+      coalition_status: getCoalitionStatus(p.external_id, p.knesset_number),
       source_url: p.source_url,
       is_demo: p.is_demo,
       last_seen_at: p.last_seen_at?.toISOString() ?? null,

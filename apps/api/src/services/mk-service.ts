@@ -21,11 +21,12 @@ export async function listMKs(opts: {
   search?: string;
   party_id?: string;
   is_current?: boolean;
+  knesset_number?: number;
   sort?: string;
   page: number;
   limit: number;
 }): Promise<{ data: MK[]; total: number }> {
-  const { search, party_id, is_current, page, limit } = opts;
+  const { search, party_id, is_current, knesset_number, page, limit } = opts;
   const skip = (page - 1) * limit;
 
   const where: NonNullable<Parameters<typeof db.mK.findMany>[0]>["where"] = {};
@@ -35,11 +36,18 @@ export async function listMKs(opts: {
       { name_he: { contains: search } },
       { name_en: { contains: search, mode: "insensitive" } },
       { name_last_he: { contains: search } },
+      { name_first_he: { contains: search } },
     ];
   }
 
   if (is_current !== undefined) {
     where.is_current = is_current;
+  }
+
+  if (knesset_number) {
+    where.memberships = {
+      some: { knesset_number },
+    };
   }
 
   if (party_id) {
