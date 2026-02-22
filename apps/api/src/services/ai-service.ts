@@ -644,11 +644,6 @@ export async function* askAIStream(question: string): AsyncGenerator<AiStreamEve
     }
 
     // ── Phase 2: stream the final text answer ──
-    const streamChat = genAI.chats.create({
-      model: MODEL_NAME,
-      config: { systemInstruction: SYSTEM_INSTRUCTION },
-    });
-
     // Re-ask with "please write your final answer" using accumulated tool context
     const toolSummary =
       toolCallsMade.length > 0 ? `[כלים שהופעלו: ${toolCallsMade.join(", ")}]\n\n` : "";
