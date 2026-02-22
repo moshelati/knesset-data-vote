@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Search, X, Loader2, Sparkles } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { Search, X, Loader2, Sparkles, Clock, ThumbsUp, ThumbsDown } from "lucide-react";
 import type { AiAnswer, EntityCard } from "@knesset-vote/shared";
 
-// ─── Search types ──────────────────────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 interface SearchResult {
   type: "mk" | "party" | "bill";
@@ -21,6 +21,13 @@ interface SearchResponse {
   query: string;
   total: number;
 }
+
+interface HistoryItem {
+  question: string;
+  ts: number;
+}
+
+// ─── Constants ───────────────────────────────────────────────────────────────
 
 const TYPE_LABELS: Record<string, string> = {
   mk: 'ח"כ',
@@ -41,9 +48,91 @@ const ENTITY_CARD_COLORS: Record<string, string> = {
   minister: "bg-purple-50 border-purple-200 text-purple-800",
 };
 
-// ─── AI Answer Panel ───────────────────────────────────────────────────────
+const HISTORY_KEY = "kv_ai_history";
+const HISTORY_MAX = 8;
 
-function AiAnswerPanel({ answer, onClose }: { answer: AiAnswer; onClose: () => void }) {
+/** Context-aware suggested questions keyed by pathname prefix */
+const SUGGESTED_BY_PATH: Array<{ match: RegExp; questions: string[] }> = [
+  {
+    match: /^\/mks\/[^/]+$/,
+    questions: [
+      'כמה הצעות חוק הגיש חה"כ הזה?',
+      "באיזה ועדות הוא חבר?",
+      "כיצד הצביע בנושאי ביטחון?",
+    ],
+  },
+  {
+    match: /^\/parties\/[^/]+$/,
+    questions: ["כמה מנדטים יש לסיעה?", 'מי הח"כים בסיעה?', "האם הסיעה בקואליציה?"],
+  },
+  {
+    match: /^\/bills\/[^/]+$/,
+    questions: ["מה המצב העדכני של הצעת החוק?", "מי הגיש את הצעת החוק?", "מה התוכן של הצעת החוק?"],
+  },
+  {
+    match: /^\/government/,
+    questions: ["מי שר האוצר?", "מי שר המשפטים?", "כמה שרים יש בממשלה?"],
+  },
+  {
+    match: /./,
+    questions: ["מי שר המשפטים?", "כמה מנדטים יש לליכוד?", "מה הצעות החוק האחרונות בנושא חינוך?"],
+  },
+];
+
+function getSuggestedQuestions(pathname: string): string[] {
+  const entry = SUGGESTED_BY_PATH.find(({ match }) => match.test(pathname));
+  return entry?.questions ?? SUGGESTED_BY_PATH[SUGGESTED_BY_PATH.length - 1]!.questions;
+}
+
+// ─── localStorage helpers ────────────────────────────────────────────────────
+
+function loadHistory(): HistoryItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? "[]") as HistoryItem[];
+  } catch {
+    return [];
+  }
+}
+
+function saveToHistory(question: string) {
+  const prev = loadHistory().filter((h) => h.question !== question);
+  const next: HistoryItem[] = [{ question, ts: Date.now() }, ...prev].slice(0, HISTORY_MAX);
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+  } catch {
+    /* quota exceeded — ignore */
+  }
+}
+
+function removeFromHistory(question: string) {
+  const next = loadHistory().filter((h) => h.question !== question);
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
+// ─── AI Answer Panel ─────────────────────────────────────────────────────────
+
+function AiAnswerPanel({
+  answer,
+  onClose,
+  onFeedback,
+}: {
+  answer: AiAnswer;
+  onClose: () => void;
+  onFeedback: (positive: boolean) => void;
+}) {
+  const [feedbackGiven, setFeedbackGiven] = useState<"up" | "down" | null>(null);
+
+  const handleFeedback = (positive: boolean) => {
+    if (feedbackGiven) return;
+    setFeedbackGiven(positive ? "up" : "down");
+    onFeedback(positive);
+  };
+
   return (
     <div
       className="border-brand-200 absolute left-0 right-0 top-full z-50 mt-1 max-h-[32rem] overflow-y-auto rounded-lg border bg-white shadow-xl"
@@ -59,13 +148,40 @@ function AiAnswerPanel({ answer, onClose }: { answer: AiAnswer; onClose: () => v
             {answer.model}
           </span>
         </div>
-        <button
-          onClick={onClose}
-          className="text-neutral-400 hover:text-neutral-600"
-          aria-label="סגור תשובת AI"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Feedback buttons */}
+          <div className="flex items-center gap-1" aria-label="דרג תשובה">
+            <button
+              onClick={() => handleFeedback(true)}
+              aria-label="תשובה טובה"
+              className={`rounded p-1 transition-colors ${
+                feedbackGiven === "up"
+                  ? "bg-green-100 text-green-600"
+                  : "text-neutral-400 hover:bg-green-50 hover:text-green-500"
+              }`}
+            >
+              <ThumbsUp className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => handleFeedback(false)}
+              aria-label="תשובה לא טובה"
+              className={`rounded p-1 transition-colors ${
+                feedbackGiven === "down"
+                  ? "bg-red-100 text-red-600"
+                  : "text-neutral-400 hover:bg-red-50 hover:text-red-500"
+              }`}
+            >
+              <ThumbsDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-neutral-400 hover:text-neutral-600"
+            aria-label="סגור תשובת AI"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Answer text */}
@@ -147,7 +263,7 @@ function AiAnswerPanel({ answer, onClose }: { answer: AiAnswer; onClose: () => v
   );
 }
 
-// ─── Main GlobalSearch component ───────────────────────────────────────────
+// ─── Main GlobalSearch component ─────────────────────────────────────────────
 
 export function GlobalSearch() {
   // Normal search state
@@ -163,12 +279,24 @@ export function GlobalSearch() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
+  // History state (loaded lazily to avoid SSR mismatch)
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
-  // ── Normal search ──────────────────────────────────────────────────────
+  const suggestedQuestions = getSuggestedQuestions(pathname ?? "/");
+
+  // Load history on mount (client-only)
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
+
+  // ── Normal search ───────────────────────────────────────────────────────
 
   const search = useCallback(async (q: string) => {
     if (q.trim().length < 2) {
@@ -194,13 +322,14 @@ export function GlobalSearch() {
     }
   }, []);
 
-  // ── AI ask ────────────────────────────────────────────────────────────
+  // ── AI ask ─────────────────────────────────────────────────────────────
 
   const askAI = useCallback(async (q: string) => {
     if (q.trim().length < 3) return;
     setAiLoading(true);
     setAiError(null);
     setAiAnswer(null);
+    setShowHistory(false);
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
       const res = await fetch(`${apiBase}/api/ai/answer`, {
@@ -215,6 +344,9 @@ export function GlobalSearch() {
       if (!res.ok) throw new Error(`${res.status}`);
       const data = (await res.json()) as { data: AiAnswer };
       setAiAnswer(data.data);
+      // Save to history
+      saveToHistory(q.trim());
+      setHistory(loadHistory());
     } catch {
       setAiError("שגיאה בחיבור ל-AI. נסה שנית.");
     } finally {
@@ -222,24 +354,60 @@ export function GlobalSearch() {
     }
   }, []);
 
-  // ── Event handlers ────────────────────────────────────────────────────
+  // ── Feedback ───────────────────────────────────────────────────────────
+
+  const handleFeedback = useCallback(
+    async (positive: boolean) => {
+      if (!aiAnswer) return;
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+        // Best-effort: fire and forget
+        void fetch(`${apiBase}/api/ai/feedback`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: aiAnswer.question,
+            positive,
+            model: aiAnswer.model,
+          }),
+        });
+      } catch {
+        /* ignore */
+      }
+    },
+    [aiAnswer],
+  );
+
+  // ── Event handlers ─────────────────────────────────────────────────────
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setQuery(val);
-    // Clear AI answer when query changes
     if (aiAnswer) setAiAnswer(null);
     if (aiError) setAiError(null);
 
-    if (!aiMode) {
+    if (aiMode) {
+      // Show history dropdown when user starts typing in AI mode
+      setShowHistory(val.length === 0 && history.length > 0);
+    } else {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => search(val), 250);
     }
   };
 
+  const handleFocus = () => {
+    if (aiMode && !query && history.length > 0) {
+      setShowHistory(true);
+    } else if (!aiMode && results.length > 0) {
+      setOpen(true);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
-      if (aiMode) {
+      if (showHistory) {
+        setShowHistory(false);
+      } else if (aiMode) {
         setAiMode(false);
         setAiAnswer(null);
         setAiError(null);
@@ -257,7 +425,6 @@ export function GlobalSearch() {
       return;
     }
 
-    // Normal search keyboard nav
     if (!open || results.length === 0) {
       if (e.key === "Enter" && query.trim()) {
         router.push(`/search?q=${encodeURIComponent(query.trim())}`);
@@ -294,15 +461,35 @@ export function GlobalSearch() {
     setOpen(false);
     setAiAnswer(null);
     setAiError(null);
+    setShowHistory(false);
     inputRef.current?.focus();
   };
 
   const toggleAiMode = () => {
-    setAiMode((m) => !m);
+    setAiMode((m) => {
+      const next = !m;
+      if (next && !query && history.length > 0) {
+        setShowHistory(true);
+      }
+      return next;
+    });
     setAiAnswer(null);
     setAiError(null);
     setOpen(false);
     inputRef.current?.focus();
+  };
+
+  const pickQuestion = (q: string) => {
+    setQuery(q);
+    setShowHistory(false);
+    inputRef.current?.focus();
+    void askAI(q);
+  };
+
+  const deleteHistoryItem = (e: React.MouseEvent, q: string) => {
+    e.stopPropagation();
+    removeFromHistory(q);
+    setHistory(loadHistory());
   };
 
   // Close dropdown on outside click
@@ -314,6 +501,7 @@ export function GlobalSearch() {
         !inputRef.current?.contains(e.target as Node)
       ) {
         closeSearch();
+        setShowHistory(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -326,8 +514,6 @@ export function GlobalSearch() {
     if (!grouped[r.type]) grouped[r.type] = [];
     grouped[r.type]!.push(r);
   }
-
-  // Flat list for keyboard nav
   const flat = results;
 
   return (
@@ -340,7 +526,7 @@ export function GlobalSearch() {
             : "focus-within:border-brand-500 border-neutral-300"
         }`}
       >
-        {/* Icon: spinner or search/sparkles */}
+        {/* Icon */}
         {loading || aiLoading ? (
           <Loader2 className="h-4 w-4 shrink-0 animate-spin text-neutral-400" aria-hidden="true" />
         ) : aiMode ? (
@@ -356,9 +542,7 @@ export function GlobalSearch() {
           value={query}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => {
-            if (!aiMode && results.length > 0) setOpen(true);
-          }}
+          onFocus={handleFocus}
           placeholder={aiMode ? "שאל שאלה על הכנסת..." : 'חפש ח"כ, סיעה, הצעת חוק...'}
           className="w-full min-w-0 bg-transparent text-sm text-neutral-700 placeholder-neutral-400 focus:outline-none"
           aria-label={aiMode ? "שאלה לעוזר AI" : "חיפוש כללי"}
@@ -425,31 +609,79 @@ export function GlobalSearch() {
             setAiAnswer(null);
             setAiError(null);
           }}
+          onFeedback={handleFeedback}
         />
       )}
 
-      {/* AI mode: hint (when mode active, query empty, no answer) */}
-      {aiMode && !query && !aiAnswer && !aiLoading && !aiError && (
+      {/* AI mode: history + suggested questions (when mode active, query empty, no answer) */}
+      {aiMode && !query && !aiAnswer && !aiLoading && !aiError && showHistory && (
+        <div
+          ref={dropdownRef}
+          className="border-brand-100 absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border bg-white shadow-lg"
+          dir="rtl"
+        >
+          {/* History section */}
+          {history.length > 0 && (
+            <div>
+              <p className="border-b border-neutral-100 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">
+                שאלות אחרונות
+              </p>
+              {history.map((item) => (
+                <div
+                  key={item.ts}
+                  onClick={() => pickQuestion(item.question)}
+                  className="group flex cursor-pointer items-center gap-2 px-4 py-2 text-sm hover:bg-neutral-50"
+                >
+                  <Clock className="h-3.5 w-3.5 shrink-0 text-neutral-300" aria-hidden="true" />
+                  <span className="flex-1 truncate text-neutral-700">{item.question}</span>
+                  <button
+                    onClick={(e) => deleteHistoryItem(e, item.question)}
+                    aria-label="הסר מהיסטוריה"
+                    className="hidden shrink-0 text-neutral-300 hover:text-red-400 group-hover:block"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Suggested questions for current page */}
+          <div className={history.length > 0 ? "border-t border-neutral-100" : ""}>
+            <p className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">
+              שאלות מוצעות
+            </p>
+            {suggestedQuestions.map((q) => (
+              <div
+                key={q}
+                onClick={() => pickQuestion(q)}
+                className="flex cursor-pointer items-center gap-2 px-4 py-2 text-sm hover:bg-neutral-50"
+              >
+                <Sparkles className="text-brand-300 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span className="text-neutral-600">{q}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI mode: static hint (focus not triggered yet) */}
+      {aiMode && !query && !aiAnswer && !aiLoading && !aiError && !showHistory && (
         <div className="border-brand-100 bg-brand-50 absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border px-4 py-3 shadow-sm">
           <p className="text-brand-700 text-xs" dir="rtl">
             <Sparkles className="mb-0.5 mr-1 inline h-3 w-3" aria-hidden="true" />
-            הקלד שאלה ולחץ Enter. לדוגמה:
+            הקלד שאלה ולחץ Enter, או לחץ על שדה החיפוש לראות הצעות.
           </p>
           <ul className="text-brand-600 mt-1.5 space-y-0.5 text-xs" dir="rtl">
-            {["מי שר המשפטים?", "כמה מנדטים יש לליכוד?", "מה הצעות החוק האחרונות בנושא חינוך?"].map(
-              (example) => (
-                <li
-                  key={example}
-                  className="cursor-pointer hover:underline"
-                  onClick={() => {
-                    setQuery(example);
-                    inputRef.current?.focus();
-                  }}
-                >
-                  • {example}
-                </li>
-              ),
-            )}
+            {suggestedQuestions.map((example) => (
+              <li
+                key={example}
+                className="cursor-pointer hover:underline"
+                onClick={() => pickQuestion(example)}
+              >
+                • {example}
+              </li>
+            ))}
           </ul>
         </div>
       )}

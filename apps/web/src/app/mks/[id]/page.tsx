@@ -14,6 +14,7 @@ import { AgendaCard } from "@/components/mk/AgendaCard";
 import { RecentBillsList } from "@/components/mk/RecentBillsList";
 import { formatDate, formatDateShort } from "@/lib/utils";
 import type { MKDetail } from "@knesset-vote/shared";
+import { AskAiButton } from "@/components/shared/AskAiButton";
 
 interface MKDetailResponse {
   data: MKDetail & { is_demo?: boolean };
@@ -126,6 +127,14 @@ export default async function MKPage({ params }: { params: { id: string } }) {
             <div className="mt-4">
               <OfficialLinksCard entityType="mk" externalId={mk.external_id} />
             </div>
+            <AskAiButton
+              defaultQuestion={`מה הפעילות החקיקתית של ${mk.name_he}?`}
+              suggestions={[
+                `כמה הצעות חוק הגיש/ה ${mk.name_he}?`,
+                `באיזה ועדות חבר/ה ${mk.name_he}?`,
+                `מה עמדות ${mk.name_he} בנושאי ביטחון?`,
+              ]}
+            />
           </div>
         </div>
       </div>

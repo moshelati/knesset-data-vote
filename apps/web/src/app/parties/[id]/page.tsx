@@ -8,6 +8,7 @@ import { MetricCard } from "@/components/shared/MetricCard";
 import { OfficialLinksCard } from "@/components/shared/OfficialLinksCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import type { PartyDetail } from "@knesset-vote/shared";
+import { AskAiButton } from "@/components/shared/AskAiButton";
 
 interface PartyDetailResponse {
   data: PartyDetail & { is_demo?: boolean };
@@ -73,6 +74,14 @@ export default async function PartyPage({ params }: { params: { id: string } }) 
         <div className="mt-4">
           <OfficialLinksCard entityType="party" externalId={party.external_id} />
         </div>
+        <AskAiButton
+          defaultQuestion={`מה הפרופיל של סיעת ${party.name_he}?`}
+          suggestions={[
+            `כמה מנדטים יש ל${party.name_he}?`,
+            `מי הח"כים של ${party.name_he}?`,
+            `האם ${party.name_he} בקואליציה?`,
+          ]}
+        />
       </div>
 
       {/* Activity metrics */}

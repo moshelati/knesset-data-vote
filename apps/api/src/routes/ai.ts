@@ -1,7 +1,9 @@
 /**
  * AI routes
  *
- * POST /api/ai/answer  → Gemini-powered "Ask + Verify" with real DB data
+ * POST /api/ai/answer   → Gemini-powered "Ask + Verify" with real DB data
+ * POST /api/ai/feedback → thumbs-up / thumbs-down stored in Redis
+ * GET  /api/ai/stats    → question count + feedback totals (admin-friendly)
  *
  * Security:
  * - GEMINI_API_KEY never returned to client
@@ -12,6 +14,11 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { askAI } from "../services/ai-service.js";
+import { getRedis } from "../plugins/redis.js";
+
+// Redis key helpers
+const AI_STATS_KEY = "ai:stats"; // HASH: questions_total, feedback_up, feedback_down
+const AI_QUESTIONS_ZSET = "ai:questions"; // ZSET: question → score=count (top questions)
 
 const AiAnswerBodySchema = z.object({
   question: z.string().min(3, "השאלה קצרה מדי").max(500, "השאלה ארוכה מדי"),
@@ -126,6 +133,17 @@ export async function aiRoutes(app: FastifyInstance): Promise<void> {
           "AI answer generated",
         );
 
+        // ── Analytics: increment counters in Redis (best-effort) ──
+        const redis = getRedis();
+        if (redis) {
+          void Promise.all([
+            redis.hincrby(AI_STATS_KEY, "questions_total", 1),
+            redis.zincrby(AI_QUESTIONS_ZSET, 1, question.slice(0, 200)),
+          ]).catch(() => {
+            /* ignore redis errors */
+          });
+        }
+
         reply.send({
           data: answer,
           methodology_url: "/methodology#ai-assistant",
@@ -156,6 +174,111 @@ export async function aiRoutes(app: FastifyInstance): Promise<void> {
           statusCode: 502,
         });
       }
+    },
+  );
+
+  // ─────────────────────────────────────────────
+  // POST /api/ai/feedback
+  // ─────────────────────────────────────────────
+  app.post(
+    "/api/ai/feedback",
+    {
+      schema: {
+        description: "Submit thumbs-up / thumbs-down feedback on an AI answer.",
+        tags: ["AI"],
+        body: {
+          type: "object",
+          required: ["question", "positive"],
+          properties: {
+            question: { type: "string", maxLength: 500 },
+            positive: { type: "boolean" },
+            model: { type: "string" },
+          },
+        },
+        response: {
+          200: { type: "object", properties: { ok: { type: "boolean" } } },
+        },
+      },
+    },
+    async (request, reply) => {
+      const body = request.body as { question: string; positive: boolean; model?: string };
+      const redis = getRedis();
+      if (redis) {
+        const field = body.positive ? "feedback_up" : "feedback_down";
+        void redis.hincrby(AI_STATS_KEY, field, 1).catch(() => {
+          /* ignore */
+        });
+        app.log.info(
+          { positive: body.positive, question: body.question.slice(0, 80) },
+          "AI feedback received",
+        );
+      }
+      reply.send({ ok: true });
+    },
+  );
+
+  // ─────────────────────────────────────────────
+  // GET /api/ai/stats
+  // ─────────────────────────────────────────────
+  app.get(
+    "/api/ai/stats",
+    {
+      schema: {
+        description: "AI usage stats: total questions, feedback counts, top questions.",
+        tags: ["AI"],
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              questions_total: { type: "number" },
+              feedback_up: { type: "number" },
+              feedback_down: { type: "number" },
+              top_questions: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    question: { type: "string" },
+                    count: { type: "number" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    async (_request, reply) => {
+      const redis = getRedis();
+      if (!redis) {
+        return reply.send({
+          questions_total: 0,
+          feedback_up: 0,
+          feedback_down: 0,
+          top_questions: [],
+        });
+      }
+
+      const [statsHash, topRaw] = await Promise.all([
+        redis.hgetall(AI_STATS_KEY),
+        redis.zrevrange(AI_QUESTIONS_ZSET, 0, 9, "WITHSCORES"),
+      ]);
+
+      // Parse ZSET WITHSCORES: [member, score, member, score, ...]
+      const top_questions: Array<{ question: string; count: number }> = [];
+      for (let i = 0; i < topRaw.length; i += 2) {
+        top_questions.push({
+          question: topRaw[i] ?? "",
+          count: Number(topRaw[i + 1] ?? 0),
+        });
+      }
+
+      reply.send({
+        questions_total: Number(statsHash?.["questions_total"] ?? 0),
+        feedback_up: Number(statsHash?.["feedback_up"] ?? 0),
+        feedback_down: Number(statsHash?.["feedback_down"] ?? 0),
+        top_questions,
+      });
     },
   );
 }

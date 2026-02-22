@@ -11,6 +11,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { formatDate, formatDateShort } from "@/lib/utils";
 import { BILL_TOPIC_LABELS } from "@knesset-vote/shared";
 import type { BillDetail } from "@knesset-vote/shared";
+import { AskAiButton } from "@/components/shared/AskAiButton";
 
 interface BillDetailResponse {
   data: BillDetail & { is_demo?: boolean };
@@ -101,6 +102,13 @@ export default async function BillPage({ params }: { params: { id: string } }) {
         <div className="mt-4">
           <OfficialLinksCard entityType="bill" externalId={bill.external_id} />
         </div>
+        <AskAiButton
+          defaultQuestion={`מה הצעת החוק "${bill.title_he}" עוסקת בה?`}
+          suggestions={[
+            `מה המצב הנוכחי של הצעת החוק "${bill.title_he}"?`,
+            `מי הגיש את הצעת החוק "${bill.title_he}"?`,
+          ]}
+        />
       </div>
 
       {/* AI Summary (if available) */}
