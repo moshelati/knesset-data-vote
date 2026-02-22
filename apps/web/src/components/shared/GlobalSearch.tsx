@@ -133,7 +133,7 @@ export function GlobalSearch() {
   const grouped: Record<string, SearchResult[]> = {};
   for (const r of results) {
     if (!grouped[r.type]) grouped[r.type] = [];
-    grouped[r.type].push(r);
+    grouped[r.type]!.push(r);
   }
 
   // Flat list for keyboard nav
