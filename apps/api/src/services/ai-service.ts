@@ -693,6 +693,8 @@ export async function* askAIStream(question: string): AsyncGenerator<AiStreamEve
     };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    // Log the raw error so we can diagnose in Railway logs
+    console.error("[askAIStream] raw error:", msg.slice(0, 500));
     yield { type: "error", message: classifyGeminiError(msg) };
   }
 }
