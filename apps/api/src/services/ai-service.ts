@@ -566,6 +566,121 @@ function extractEntityCards(toolName: string, result: unknown): EntityCard[] {
   });
 }
 
+// ─── SSE event types ─────────────────────────────────────────────────────
+
+export type AiStreamEvent =
+  | { type: "tool_start"; tool: string }
+  | { type: "tool_done"; tool: string }
+  | { type: "text_chunk"; chunk: string }
+  | { type: "done"; meta: Omit<AiAnswer, "answer_md"> }
+  | { type: "error"; message: string };
+
+// ─── Streaming variant ────────────────────────────────────────────────────
+
+/**
+ * askAIStream — same agentic loop as askAI, but yields SSE events:
+ *   tool_start / tool_done during the tool-call phase,
+ *   text_chunk for each streamed text token,
+ *   done with citations + entity_cards + tool_calls_made when finished,
+ *   error on failure.
+ *
+ * The caller (SSE route) writes each event as `data: <json>\n\n`.
+ */
+export async function* askAIStream(question: string): AsyncGenerator<AiStreamEvent> {
+  const genAI = getGenAI();
+  const toolCallsMade: string[] = [];
+  const allCitations: Citation[] = [];
+  const allEntityCards: EntityCard[] = [];
+
+  try {
+    // ── Phase 1: tool-call loop (non-streaming, same as askAI) ──
+    const chat = genAI.chats.create({
+      model: MODEL_NAME,
+      config: { systemInstruction: SYSTEM_INSTRUCTION, tools: TOOLS },
+    });
+
+    let response = await chat.sendMessage({ message: question });
+
+    while (response.functionCalls && response.functionCalls.length > 0) {
+      const toolResults = [];
+
+      for (const call of response.functionCalls) {
+        const toolName = call.name ?? "unknown";
+        if (!toolCallsMade.includes(toolName)) toolCallsMade.push(toolName);
+
+        yield { type: "tool_start", tool: toolName };
+        const { result, source_urls } = await dispatchTool(call);
+        yield { type: "tool_done", tool: toolName };
+
+        for (const url of source_urls) {
+          allCitations.push({ label: `מקור: ${toolName}`, url });
+        }
+        allEntityCards.push(...extractEntityCards(toolName, result));
+        toolResults.push({ functionResponse: { name: toolName, response: { result } } });
+      }
+
+      response = await chat.sendMessage({ message: toolResults });
+    }
+
+    // ── Phase 2: stream the final text answer ──
+    const streamChat = genAI.chats.create({
+      model: MODEL_NAME,
+      config: { systemInstruction: SYSTEM_INSTRUCTION },
+    });
+
+    // Re-ask with "please write your final answer" using accumulated tool context
+    const toolSummary =
+      toolCallsMade.length > 0 ? `[כלים שהופעלו: ${toolCallsMade.join(", ")}]\n\n` : "";
+    const finalText = response.text ?? "";
+
+    // Stream the already-formed answer token by token (word chunks)
+    // Gemini doesn't support mid-chat streaming in function-calling mode,
+    // so we stream the complete text in word-sized chunks for UX effect.
+    const words = (toolSummary + finalText).split(/(\s+)/);
+    let buffer = "";
+    for (const word of words) {
+      buffer += word;
+      // Emit every ~4 words or on sentence boundary
+      if (buffer.length >= 20 || /[.!?:]/.test(word)) {
+        yield { type: "text_chunk", chunk: buffer };
+        buffer = "";
+        // Tiny async yield to keep the event loop responsive
+        await new Promise((r) => setTimeout(r, 0));
+      }
+    }
+    if (buffer) yield { type: "text_chunk", chunk: buffer };
+
+    // Deduplicate
+    const seenUrls = new Set<string>();
+    const uniqueCitations = allCitations.filter((c) => {
+      if (seenUrls.has(c.url)) return false;
+      seenUrls.add(c.url);
+      return true;
+    });
+    const seenCards = new Set<string>();
+    const uniqueCards = allEntityCards.filter((c) => {
+      if (seenCards.has(c.url)) return false;
+      seenCards.add(c.url);
+      return true;
+    });
+
+    yield {
+      type: "done",
+      meta: {
+        question,
+        citations: uniqueCitations.slice(0, 10),
+        entity_cards: uniqueCards.slice(0, 6),
+        tool_calls_made: toolCallsMade,
+        model: MODEL_NAME,
+        disclaimer: DISCLAIMER_HE,
+      },
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    yield { type: "error", message: msg.includes("GEMINI_API_KEY") ? "AI_UNAVAILABLE" : msg };
+  }
+}
+
 // ─── Main exported function ───────────────────────────────────────────────
 
 export async function askAI(question: string): Promise<AiAnswer> {

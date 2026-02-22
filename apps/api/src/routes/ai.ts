@@ -13,7 +13,7 @@
 
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { askAI } from "../services/ai-service.js";
+import { askAI, askAIStream } from "../services/ai-service.js";
 import { getRedis } from "../plugins/redis.js";
 
 // Redis key helpers
@@ -173,6 +173,84 @@ export async function aiRoutes(app: FastifyInstance): Promise<void> {
           message: "שגיאה בחיבור לשירות ה-AI. נסה שוב מאוחר יותר.",
           statusCode: 502,
         });
+      }
+    },
+  );
+
+  // ─────────────────────────────────────────────
+  // GET /api/ai/stream?q=<question>
+  // Server-Sent Events — streams tool events + text chunks
+  // ─────────────────────────────────────────────
+  app.get(
+    "/api/ai/stream",
+    {
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: "1 minute",
+          errorResponseBuilder: () => ({
+            error: "Too Many AI Requests",
+            message: "מותרות 10 שאלות לדקה לכתובת IP. נסה שוב עוד דקה.",
+            statusCode: 429,
+          }),
+        },
+      },
+      schema: {
+        description:
+          "Streaming SSE endpoint. Emits tool_start / tool_done / text_chunk / done / error events.",
+        tags: ["AI"],
+        querystring: {
+          type: "object",
+          required: ["q"],
+          properties: {
+            q: { type: "string", minLength: 3, maxLength: 500 },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { q } = request.query as { q: string };
+
+      if (!q || q.trim().length < 3) {
+        return reply.status(400).send({ error: "Bad Request", message: "שאלה קצרה מדי" });
+      }
+
+      // Set SSE headers — bypass Fastify's JSON serialization
+      void reply.raw.writeHead(200, {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no", // disable nginx buffering
+      });
+
+      const send = (event: object) => {
+        reply.raw.write(`data: ${JSON.stringify(event)}\n\n`);
+      };
+
+      // Heartbeat every 15s to keep connection alive through proxies
+      const heartbeat = setInterval(() => {
+        reply.raw.write(": heartbeat\n\n");
+      }, 15_000);
+
+      try {
+        for await (const event of askAIStream(q.trim())) {
+          send(event);
+          if (event.type === "done" || event.type === "error") break;
+        }
+        // Analytics (best-effort)
+        const redis = getRedis();
+        if (redis) {
+          void Promise.all([
+            redis.hincrby(AI_STATS_KEY, "questions_total", 1),
+            redis.zincrby(AI_QUESTIONS_ZSET, 1, q.trim().slice(0, 200)),
+          ]).catch(() => {});
+        }
+      } catch (err) {
+        send({ type: "error", message: "שגיאה פנימית" });
+        app.log.error({ err }, "AI stream error");
+      } finally {
+        clearInterval(heartbeat);
+        reply.raw.end();
       }
     },
   );

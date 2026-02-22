@@ -278,6 +278,11 @@ export function GlobalSearch() {
   const [aiAnswer, setAiAnswer] = useState<AiAnswer | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  // Streaming state
+  const [streamText, setStreamText] = useState("");
+  const [streamPhase, setStreamPhase] = useState<"idle" | "tools" | "text" | "done">("idle");
+  const [activeTools, setActiveTools] = useState<string[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
 
   // History state (loaded lazily to avoid SSR mismatch)
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -322,35 +327,100 @@ export function GlobalSearch() {
     }
   }, []);
 
-  // ── AI ask ─────────────────────────────────────────────────────────────
+  // ── AI ask (SSE streaming) ─────────────────────────────────────────────
 
   const askAI = useCallback(async (q: string) => {
     if (q.trim().length < 3) return;
+
+    // Abort any in-flight request
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+
     setAiLoading(true);
     setAiError(null);
     setAiAnswer(null);
+    setStreamText("");
+    setStreamPhase("tools");
+    setActiveTools([]);
     setShowHistory(false);
+
+    let accumulated = "";
+
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-      const res = await fetch(`${apiBase}/api/ai/answer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q.trim() }),
+      const res = await fetch(`${apiBase}/api/ai/stream?q=${encodeURIComponent(q.trim())}`, {
+        signal: ctrl.signal,
       });
+
       if (res.status === 429) {
         setAiError("הגעת למגבלת השאלות (10 לדקה). נסה שוב עוד דקה.");
         return;
       }
       if (!res.ok) throw new Error(`${res.status}`);
-      const data = (await res.json()) as { data: AiAnswer };
-      setAiAnswer(data.data);
-      // Save to history
-      saveToHistory(q.trim());
-      setHistory(loadHistory());
-    } catch {
-      setAiError("שגיאה בחיבור ל-AI. נסה שנית.");
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) throw new Error("no body");
+
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const raw = line.slice(5).trim();
+          if (!raw) continue;
+          try {
+            const event = JSON.parse(raw) as {
+              type: string;
+              tool?: string;
+              chunk?: string;
+              meta?: Omit<AiAnswer, "answer_md"> & { question: string };
+              message?: string;
+            };
+            switch (event.type) {
+              case "tool_start":
+                setStreamPhase("tools");
+                if (event.tool) setActiveTools((t) => [...new Set([...t, event.tool!])]);
+                break;
+              case "text_chunk":
+                setStreamPhase("text");
+                if (event.chunk) {
+                  accumulated += event.chunk;
+                  setStreamText(accumulated);
+                }
+                break;
+              case "done":
+                setStreamPhase("done");
+                if (event.meta) {
+                  setAiAnswer({ ...event.meta, answer_md: accumulated } as AiAnswer);
+                }
+                saveToHistory(q.trim());
+                setHistory(loadHistory());
+                break;
+              case "error":
+                setAiError(event.message ?? "שגיאה בחיבור ל-AI.");
+                break;
+            }
+          } catch {
+            /* malformed line */
+          }
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        setAiError("שגיאה בחיבור ל-AI. נסה שנית.");
+      }
     } finally {
       setAiLoading(false);
+      abortRef.current = null;
     }
   }, []);
 
@@ -409,8 +479,7 @@ export function GlobalSearch() {
         setShowHistory(false);
       } else if (aiMode) {
         setAiMode(false);
-        setAiAnswer(null);
-        setAiError(null);
+        resetAiState();
       } else {
         closeSearch();
       }
@@ -455,12 +524,20 @@ export function GlobalSearch() {
     setActiveIdx(-1);
   };
 
+  const resetAiState = () => {
+    abortRef.current?.abort();
+    setAiAnswer(null);
+    setAiError(null);
+    setStreamText("");
+    setStreamPhase("idle");
+    setActiveTools([]);
+  };
+
   const clearSearch = () => {
     setQuery("");
     setResults([]);
     setOpen(false);
-    setAiAnswer(null);
-    setAiError(null);
+    resetAiState();
     setShowHistory(false);
     inputRef.current?.focus();
   };
@@ -473,8 +550,7 @@ export function GlobalSearch() {
       }
       return next;
     });
-    setAiAnswer(null);
-    setAiError(null);
+    resetAiState();
     setOpen(false);
     inputRef.current?.focus();
   };
@@ -576,13 +652,35 @@ export function GlobalSearch() {
         </button>
       </div>
 
-      {/* AI mode: loading */}
+      {/* AI mode: streaming panel (loading + live text) */}
       {aiMode && aiLoading && (
-        <div className="border-brand-200 absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border bg-white p-4 shadow-lg">
-          <div className="flex items-center gap-2 text-sm text-neutral-600">
-            <Loader2 className="text-brand-500 h-4 w-4 animate-spin" aria-hidden="true" />
-            <span>מחפש ובודק נתונים...</span>
+        <div
+          className="border-brand-200 absolute left-0 right-0 top-full z-50 mt-1 max-h-[32rem] overflow-y-auto rounded-lg border bg-white shadow-xl"
+          dir="rtl"
+        >
+          {/* Phase header */}
+          <div className="from-brand-50 flex items-center gap-2 border-b border-neutral-100 bg-gradient-to-l to-white px-4 py-2.5">
+            <Loader2 className="text-brand-500 h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <span className="text-brand-700 text-xs font-semibold">
+              {streamPhase === "tools" ? "בודק נתונים..." : "מנסח תשובה..."}
+            </span>
+            {/* Active tool badges */}
+            {activeTools.map((t) => (
+              <span
+                key={t}
+                className="rounded-full bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] text-neutral-500"
+              >
+                {t}
+              </span>
+            ))}
           </div>
+          {/* Live text */}
+          {streamText && (
+            <div className="px-4 py-3 text-sm leading-relaxed text-neutral-800">
+              {streamText}
+              <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-neutral-400" />
+            </div>
+          )}
         </div>
       )}
 
@@ -601,13 +699,16 @@ export function GlobalSearch() {
         </div>
       )}
 
-      {/* AI mode: answer panel */}
+      {/* AI mode: full answer panel (after stream done) */}
       {aiMode && aiAnswer && !aiLoading && (
         <AiAnswerPanel
           answer={aiAnswer}
           onClose={() => {
             setAiAnswer(null);
             setAiError(null);
+            setStreamText("");
+            setStreamPhase("idle");
+            setActiveTools([]);
           }}
           onFeedback={handleFeedback}
         />

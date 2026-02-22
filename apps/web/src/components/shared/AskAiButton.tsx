@@ -7,7 +7,7 @@
  * a pre-filled question based on the entity context. The user can edit the
  * question before submitting.
  *
- * Uses POST /api/ai/answer — same endpoint as GlobalSearch AI mode.
+ * Uses GET /api/ai/stream (SSE) for streaming responses.
  */
 
 import { useState, useRef, useEffect } from "react";
@@ -36,6 +36,11 @@ export function AskAiButton({ defaultQuestion, suggestions = [] }: AskAiButtonPr
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [feedbackGiven, setFeedbackGiven] = useState<"up" | "down" | null>(null);
+  // Streaming state
+  const [streamText, setStreamText] = useState("");
+  const [streamPhase, setStreamPhase] = useState<"idle" | "tools" | "text">("idle");
+  const [activeTools, setActiveTools] = useState<string[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -48,28 +53,86 @@ export function AskAiButton({ defaultQuestion, suggestions = [] }: AskAiButtonPr
 
   const ask = async (q: string) => {
     if (q.trim().length < 3) return;
+
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+
     setLoading(true);
     setError(null);
     setAnswer(null);
     setFeedbackGiven(null);
+    setStreamText("");
+    setStreamPhase("tools");
+    setActiveTools([]);
+
+    let accumulated = "";
+
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-      const res = await fetch(`${apiBase}/api/ai/answer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q.trim() }),
+      const res = await fetch(`${apiBase}/api/ai/stream?q=${encodeURIComponent(q.trim())}`, {
+        signal: ctrl.signal,
       });
       if (res.status === 429) {
         setError("הגעת למגבלת השאלות (10 לדקה). נסה שוב עוד דקה.");
         return;
       }
       if (!res.ok) throw new Error(`${res.status}`);
-      const data = (await res.json()) as { data: AiAnswer };
-      setAnswer(data.data);
-    } catch {
-      setError("שגיאה בחיבור ל-AI. נסה שנית.");
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) throw new Error("no body");
+
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const raw = line.slice(5).trim();
+          if (!raw) continue;
+          try {
+            const event = JSON.parse(raw) as {
+              type: string;
+              tool?: string;
+              chunk?: string;
+              meta?: Omit<AiAnswer, "answer_md"> & { question: string };
+              message?: string;
+            };
+            switch (event.type) {
+              case "tool_start":
+                setStreamPhase("tools");
+                if (event.tool) setActiveTools((t) => [...new Set([...t, event.tool!])]);
+                break;
+              case "text_chunk":
+                setStreamPhase("text");
+                if (event.chunk) {
+                  accumulated += event.chunk;
+                  setStreamText(accumulated);
+                }
+                break;
+              case "done":
+                if (event.meta) setAnswer({ ...event.meta, answer_md: accumulated } as AiAnswer);
+                break;
+              case "error":
+                setError(event.message ?? "שגיאה בחיבור ל-AI.");
+                break;
+            }
+          } catch {
+            /* malformed line */
+          }
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        setError("שגיאה בחיבור ל-AI. נסה שנית.");
+      }
     } finally {
       setLoading(false);
+      abortRef.current = null;
     }
   };
 
@@ -89,8 +152,12 @@ export function AskAiButton({ defaultQuestion, suggestions = [] }: AskAiButtonPr
   };
 
   const reset = () => {
+    abortRef.current?.abort();
     setAnswer(null);
     setError(null);
+    setStreamText("");
+    setStreamPhase("idle");
+    setActiveTools([]);
     setQuestion(defaultQuestion);
     setFeedbackGiven(null);
     setTimeout(() => textareaRef.current?.focus(), 50);
@@ -135,7 +202,8 @@ export function AskAiButton({ defaultQuestion, suggestions = [] }: AskAiButtonPr
                     }
                   }}
                   rows={2}
-                  className="focus:border-brand-400 flex-1 resize-none rounded-md border border-neutral-200 px-3 py-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none"
+                  disabled={loading}
+                  className="focus:border-brand-400 flex-1 resize-none rounded-md border border-neutral-200 px-3 py-2 text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none disabled:opacity-60"
                   placeholder="שאל שאלה על ישות זו..."
                   dir="rtl"
                 />
@@ -151,6 +219,32 @@ export function AskAiButton({ defaultQuestion, suggestions = [] }: AskAiButtonPr
                   )}
                 </button>
               </div>
+
+              {/* Streaming live panel */}
+              {loading && (
+                <div className="mt-2 rounded-md bg-neutral-50 p-2">
+                  <div className="mb-1 flex items-center gap-1.5">
+                    <Loader2 className="text-brand-500 h-3 w-3 animate-spin" />
+                    <span className="text-[10px] text-neutral-500">
+                      {streamPhase === "tools" ? "בודק נתונים..." : "מנסח תשובה..."}
+                    </span>
+                    {activeTools.map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-full bg-neutral-200 px-1.5 py-0.5 font-mono text-[9px] text-neutral-600"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  {streamText && (
+                    <p className="text-xs leading-relaxed text-neutral-700" dir="rtl">
+                      {streamText}
+                      <span className="ml-0.5 inline-block h-3 w-0.5 animate-pulse bg-neutral-400" />
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Suggestions */}
               {suggestions.length > 0 && (
@@ -168,14 +262,6 @@ export function AskAiButton({ defaultQuestion, suggestions = [] }: AskAiButtonPr
                     </button>
                   ))}
                 </div>
-              )}
-
-              {/* Loading */}
-              {loading && (
-                <p className="mt-2 flex items-center gap-1.5 text-xs text-neutral-400">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  מחפש ובודק נתונים...
-                </p>
               )}
 
               {/* Error */}
