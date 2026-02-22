@@ -12,3 +12,4 @@ export * from "./schemas/ai.js";
 export * from "./types/index.js";
 export * from "./constants/index.js";
 export * from "./constants/my-election.js";
+export * from "./constants/ai-demo-questions.js";

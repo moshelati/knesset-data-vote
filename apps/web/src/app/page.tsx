@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Search, ExternalLink, RefreshCcw } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import type { MetaResponse } from "@knesset-vote/shared";
+import { HeroAiSection } from "@/components/home/HeroAiSection";
 
 async function getMetaData() {
   try {
@@ -41,14 +42,14 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="from-brand-700 to-brand-900 bg-gradient-to-br px-4 py-20 text-white">
+      <section className="from-brand-700 to-brand-900 bg-gradient-to-br px-4 py-16 text-white sm:py-20">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">הצביעו עם נתונים</h1>
           <p className="text-brand-100 mb-8 text-xl">
             מידע פרלמנטרי מאומת ממקורות רשמיים — ללא טענות שלא ניתן לאמת.
           </p>
 
-          {/* Search */}
+          {/* Classic search form */}
           <form action="/search" method="get" className="mx-auto max-w-2xl">
             <div className="flex rounded-xl bg-white shadow-lg">
               <label htmlFor="search-input" className="sr-only">
@@ -83,6 +84,13 @@ export default async function HomePage() {
               }).format(new Date(meta.last_updated))}
             </p>
           )}
+
+          {/* AI section — client component */}
+          <div className="mt-8 border-t border-white/20 pt-8">
+            <Suspense fallback={null}>
+              <HeroAiSection />
+            </Suspense>
+          </div>
         </div>
       </section>
 
