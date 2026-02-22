@@ -405,19 +405,21 @@ export function AiChatOverlay({ open, onClose, initialQuestion = "" }: AiChatOve
                   }
                   break;
 
-                case "error":
+                case "error": {
+                  const rawMsg = event.message ?? "";
+                  const friendlyMsg =
+                    rawMsg === "AI_UNAVAILABLE"
+                      ? "שירות ה-AI אינו זמין כרגע. נסה שוב מאוחר יותר."
+                      : rawMsg || "שגיאה בחיבור ל-AI.";
                   setMessages((m) =>
                     m.map((msg) =>
                       msg.id === assistantId
-                        ? {
-                            ...msg,
-                            loading: false,
-                            error: event.message ?? "שגיאה בחיבור ל-AI.",
-                          }
+                        ? { ...msg, loading: false, error: friendlyMsg }
                         : msg,
                     ),
                   );
                   break;
+                }
               }
             } catch {
               /* malformed line */

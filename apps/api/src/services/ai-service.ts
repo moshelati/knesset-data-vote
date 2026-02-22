@@ -78,6 +78,27 @@ function getGenAI(): GoogleGenAI {
   return _genAI;
 }
 
+/**
+ * Maps raw Gemini API error messages to friendly Hebrew strings
+ * so we never leak internal details to the client.
+ */
+function classifyGeminiError(msg: string): string {
+  if (msg.includes("GEMINI_API_KEY") || msg.includes("API_KEY_INVALID")) {
+    return "AI_UNAVAILABLE";
+  }
+  if (msg.includes("RESOURCE_EXHAUSTED") || msg.includes("quota") || msg.includes("free_tier")) {
+    return "שירות ה-AI עמוס כרגע — נסה שוב עוד כמה שניות.";
+  }
+  if (msg.includes("PERMISSION_DENIED") || msg.includes("403")) {
+    return "AI_UNAVAILABLE";
+  }
+  if (msg.includes("UNAVAILABLE") || msg.includes("503")) {
+    return "שירות ה-AI אינו זמין כרגע. נסה שוב מאוחר יותר.";
+  }
+  // Generic fallback — don't expose raw Gemini error text
+  return "שגיאה בעיבוד השאלה. נסה שוב.";
+}
+
 // ─── Tool implementations (DB queries) ───────────────────────────────────
 
 /**
@@ -677,7 +698,7 @@ export async function* askAIStream(question: string): AsyncGenerator<AiStreamEve
     };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    yield { type: "error", message: msg.includes("GEMINI_API_KEY") ? "AI_UNAVAILABLE" : msg };
+    yield { type: "error", message: classifyGeminiError(msg) };
   }
 }
 

@@ -152,19 +152,33 @@ export async function aiRoutes(app: FastifyInstance): Promise<void> {
         const errorMessage = err instanceof Error ? err.message : String(err);
 
         // Don't expose GEMINI_API_KEY or internal details in the error message
-        const isKeyError = errorMessage.includes("GEMINI_API_KEY");
-        const isMissingKey = isKeyError || errorMessage.includes("API_KEY_INVALID");
+        const isKeyError =
+          errorMessage.includes("GEMINI_API_KEY") ||
+          errorMessage.includes("API_KEY_INVALID") ||
+          errorMessage.includes("PERMISSION_DENIED");
+        const isQuota =
+          errorMessage.includes("RESOURCE_EXHAUSTED") ||
+          errorMessage.includes("quota") ||
+          errorMessage.includes("free_tier");
 
         app.log.error(
           { err: isKeyError ? "GEMINI_API_KEY configuration error" : err },
           "AI service error",
         );
 
-        if (isMissingKey) {
+        if (isKeyError) {
           return reply.status(502).send({
             error: "AI_UNAVAILABLE",
             message: "שירות ה-AI אינו מוגדר כרגע. פנה למנהל המערכת.",
             statusCode: 502,
+          });
+        }
+
+        if (isQuota) {
+          return reply.status(429).send({
+            error: "AI_QUOTA_EXCEEDED",
+            message: "שירות ה-AI עמוס כרגע — נסה שוב עוד כמה שניות.",
+            statusCode: 429,
           });
         }
 
