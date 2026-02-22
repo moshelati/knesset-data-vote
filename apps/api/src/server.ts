@@ -49,12 +49,20 @@ async function build() {
   });
 
   // ─── CORS ───
+  // Allow any configured WEB_ORIGIN + all vercel.app previews + localhost dev
+  const allowedOrigins: (string | RegExp)[] =
+    process.env["NODE_ENV"] === "production"
+      ? [
+          /https:\/\/.*\.vercel\.app$/,
+          "https://knesset-data-vote-web.vercel.app",
+          ...(process.env["WEB_ORIGIN"] ? [process.env["WEB_ORIGIN"]] : []),
+        ]
+      : [true as unknown as string];
+
   await app.register(cors, {
-    origin:
-      process.env["NODE_ENV"] === "production"
-        ? [process.env["WEB_ORIGIN"] ?? "https://knesset-vote.il"]
-        : true,
+    origin: process.env["NODE_ENV"] === "production" ? allowedOrigins : true,
     methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
   });
 
   // ─── Rate limiting ───
