@@ -89,7 +89,7 @@ export function QuestionTicker({ onSelect, className = "" }: QuestionTickerProps
 
       {/* Dot navigation */}
       <div className="flex items-center gap-1.5" role="tablist" aria-label="שאלות לדוגמה">
-        {questions.map((q, i) => (
+        {questions.map((_q: DemoQuestion, i: number) => (
           <button
             key={i}
             role="tab"
@@ -109,7 +109,7 @@ export function QuestionTicker({ onSelect, className = "" }: QuestionTickerProps
 
       {/* All questions grid — visible on wider screens */}
       <div className="mt-1 hidden flex-wrap justify-center gap-2 sm:flex">
-        {questions.slice(0, 6).map((q, i) => {
+        {questions.slice(0, 6).map((q: DemoQuestion, i: number) => {
           const fill = q.defaultFill ?? "...";
           const label = q.text.replace("___", fill);
           const colorClass = DEMO_QUESTION_CATEGORY_COLORS[q.category];
