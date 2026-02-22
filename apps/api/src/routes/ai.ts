@@ -215,12 +215,29 @@ export async function aiRoutes(app: FastifyInstance): Promise<void> {
         return reply.status(400).send({ error: "Bad Request", message: "שאלה קצרה מדי" });
       }
 
-      // Set SSE headers — bypass Fastify's JSON serialization
+      // Set SSE headers — bypass Fastify's JSON serialization.
+      // Because we use reply.raw.writeHead() directly, Fastify's CORS plugin
+      // headers don't get injected automatically — we must add them manually.
+      const requestOrigin = request.headers["origin"] ?? "";
+      const allowedOriginPatterns = [
+        /^https:\/\/.*\.vercel\.app$/,
+        /^https:\/\/knesset-data-vote-web\.vercel\.app$/,
+        /^http:\/\/localhost(:\d+)?$/,
+      ];
+      const corsOrigin = allowedOriginPatterns.some((p) => p.test(requestOrigin))
+        ? requestOrigin
+        : "";
+
       void reply.raw.writeHead(200, {
         "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache, no-transform",
         Connection: "keep-alive",
         "X-Accel-Buffering": "no", // disable nginx buffering
+        ...(corsOrigin && {
+          "Access-Control-Allow-Origin": corsOrigin,
+          "Access-Control-Allow-Credentials": "true",
+          Vary: "Origin",
+        }),
       });
 
       const send = (event: object) => {
