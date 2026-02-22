@@ -413,9 +413,7 @@ export function AiChatOverlay({ open, onClose, initialQuestion = "" }: AiChatOve
                       : rawMsg || "שגיאה בחיבור ל-AI.";
                   setMessages((m) =>
                     m.map((msg) =>
-                      msg.id === assistantId
-                        ? { ...msg, loading: false, error: friendlyMsg }
-                        : msg,
+                      msg.id === assistantId ? { ...msg, loading: false, error: friendlyMsg } : msg,
                     ),
                   );
                   break;
