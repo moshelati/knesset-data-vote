@@ -16,6 +16,7 @@ import { promiseRoutes } from "./routes/promises.js";
 import { voteRoutes } from "./routes/votes.js";
 import { recommendationRoutes } from "./routes/recommendations.js";
 import { governmentRoutes } from "./routes/government.js";
+import { aiRoutes } from "./routes/ai.js";
 import { RATE_LIMIT } from "@knesset-vote/shared";
 
 const PORT = Number(process.env["PORT"] ?? process.env["API_PORT"] ?? 3001);
@@ -106,6 +107,12 @@ async function build() {
           description: "My Election — personalized party recommendations",
         },
         { name: "Government", description: "Current government ministers and their roles" },
+        {
+          name: "AI",
+          description:
+            "AI assistant — Gemini-powered Q&A with real DB data. " +
+            "GEMINI_API_KEY is server-side only, never exposed to clients.",
+        },
       ],
     },
   });
@@ -153,6 +160,7 @@ async function build() {
   await app.register(voteRoutes);
   await app.register(recommendationRoutes);
   await app.register(governmentRoutes);
+  await app.register(aiRoutes);
 
   return app;
 }

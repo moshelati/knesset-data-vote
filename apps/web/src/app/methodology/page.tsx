@@ -48,6 +48,7 @@ export default async function MethodologyPage() {
             { href: "#confidence", label: "רמות ביטחון" },
             { href: "#limitations", label: "מגבלות ידועות" },
             { href: "#auditability", label: "ביקורתיות ושקיפות" },
+            { href: "#ai-assistant", label: "עוזר AI — שאל ובדוק" },
             { href: "#my-election-scoring", label: "הבחירות שלי — שיטת חישוב" },
             { href: "#my-election-limitations", label: "הבחירות שלי — מגבלות" },
           ].map(({ href, label }) => (
@@ -283,6 +284,82 @@ export default async function MethodologyPage() {
                 </li>
                 <li>
                   <strong>סגני שרים:</strong> כלולים אם רשומים ב-OData עם IsCurrent=true.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* AI Assistant */}
+        <section id="ai-assistant" aria-labelledby="ai-assistant-heading">
+          <h2 id="ai-assistant-heading" className="text-2xl font-bold text-neutral-900">
+            עוזר AI — שאל ובדוק
+          </h2>
+          <p className="mt-3 leading-relaxed text-neutral-700">
+            עוזר ה-AI מאפשר לשאול שאלות בשפה טבעית על הכנסת ולקבל תשובות המגובות בנתונים אמיתיים
+            ממסד הנתונים. כל תשובה מלווה ב-source_url לאימות עצמאי.
+          </p>
+          <div className="card mt-4 space-y-3 p-5 text-sm text-neutral-700">
+            <div>
+              <strong>מנוע AI:</strong> Gemini 2.0 Flash של Google — דגם מהיר התומך ב-function
+              calling.
+            </div>
+            <div>
+              <strong>Function Calling — כלים זמינים:</strong>
+              <ul className="mt-2 list-inside list-disc space-y-1">
+                <li>
+                  <code className="rounded bg-neutral-100 px-1 font-mono">search_mks</code> — חיפוש
+                  חברי כנסת לפי שם
+                </li>
+                <li>
+                  <code className="rounded bg-neutral-100 px-1 font-mono">get_mk_detail</code> —
+                  פרטי ח&quot;כ כולל הצעות חוק וועדות
+                </li>
+                <li>
+                  <code className="rounded bg-neutral-100 px-1 font-mono">search_bills</code> —
+                  חיפוש הצעות חוק לפי נושא או מילת מפתח
+                </li>
+                <li>
+                  <code className="rounded bg-neutral-100 px-1 font-mono">get_party_info</code> —
+                  מידע על סיעה (מנדטים, קואליציה/אופוזיציה)
+                </li>
+                <li>
+                  <code className="rounded bg-neutral-100 px-1 font-mono">list_ministers</code> —
+                  רשימת שרי הממשלה הנוכחיים
+                </li>
+                <li>
+                  <code className="rounded bg-neutral-100 px-1 font-mono">search_votes</code> —
+                  חיפוש הצבעות פרלמנטריות
+                </li>
+              </ul>
+            </div>
+            <div>
+              <strong>שמירת מפתח API:</strong> מפתח ה-Gemini API נשמר בשרת בלבד (Railway) ולעולם
+              אינו נחשף לדפדפן, לתוצאות ה-API, או לקוד הצד-לקוח.
+            </div>
+            <div>
+              <strong>אי-המצאה:</strong> ה-AI מחויב בהנחיית מערכת להישען אך ורק על תוצאות tool calls
+              ממסד הנתונים. אם אין נתונים — התשובה מציינת זאת במפורש.
+            </div>
+            <div className="rounded-md bg-amber-50 p-3 text-amber-800">
+              <strong>⚠ מגבלות חשובות:</strong>
+              <ul className="mt-1 list-inside list-disc space-y-1">
+                <li>
+                  <strong>פרטיות:</strong> שאלות נשלחות ל-Google Gemini לעיבוד ואינן נשמרות בשרתינו.
+                </li>
+                <li>
+                  <strong>מגבלת קצב:</strong> 10 שאלות לדקה לכתובת IP.
+                </li>
+                <li>
+                  <strong>רעננות:</strong> הנתונים הם מהסנכרון האחרון מ-Knesset OData — לא זמן-אמת.
+                </li>
+                <li>
+                  <strong>טווח נושאים:</strong> ה-AI עונה רק על שאלות הקשורות לכנסת ישראל. שאלות
+                  מחוץ לתחום יסורבו.
+                </li>
+                <li>
+                  <strong>שגיאות אפשריות:</strong> למרות ההגבלות, ה-AI עלול לפרש שאלות בצורה שגויה.
+                  בדוק תמיד את ה-source_url המצורף.
                 </li>
               </ul>
             </div>
