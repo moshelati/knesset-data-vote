@@ -23,7 +23,7 @@ import type { Citation, EntityCard, AiAnswer } from "@knesset-vote/shared";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const MODEL_NAME = "gemini-2.0-flash";
+const MODEL_NAME = "gemini-2.5-flash-preview-04-17";
 
 const SYSTEM_INSTRUCTION = `אתה עוזר AI של Knesset Vote — פלטפורמת שקיפות פרלמנטרית ישראלית.
 
