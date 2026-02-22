@@ -36,19 +36,8 @@ async function build() {
     requestIdLogLabel: "requestId",
   });
 
-  // ─── Security headers ───
-  await app.register(helmet, {
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https:"],
-        scriptSrc: ["'self'"],
-      },
-    },
-  });
-
   // ─── CORS ───
+  // Must be registered BEFORE helmet so CORS headers are set correctly.
   // Allow any configured WEB_ORIGIN + all vercel.app previews + localhost dev
   const allowedOrigins: (string | RegExp)[] =
     process.env["NODE_ENV"] === "production"
@@ -63,6 +52,20 @@ async function build() {
     origin: process.env["NODE_ENV"] === "production" ? allowedOrigins : true,
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
+  });
+
+  // ─── Security headers ───
+  await app.register(helmet, {
+    // Allow cross-origin reads so the Vercel frontend can fetch our API
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: ["'self'"],
+      },
+    },
   });
 
   // ─── Rate limiting ───
