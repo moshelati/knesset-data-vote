@@ -33,28 +33,26 @@ interface FactionGroup {
 
 async function getParties(search?: string): Promise<PartiesResponse | null> {
   try {
-    const PAGE_LIMIT = 100;
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    params.set("limit", String(PAGE_LIMIT));
+    params.set("limit", "100");
 
     const first = await apiFetch<PartiesResponse>(`/api/parties?${params.toString()}`);
-    if (!first) return null;
+    if (!first || first.pages <= 1) return first;
 
-    // Fetch remaining pages if there are more than 100 parties
-    if (first.pages <= 1) return first;
-
+    // Fetch remaining pages in parallel
+    const pageNumbers = Array.from({ length: first.pages - 1 }, (_, i) => i + 2);
     const rest = await Promise.all(
-      Array.from({ length: first.pages - 1 }, (_, i) => {
+      pageNumbers.map((page) => {
         const p = new URLSearchParams(params);
-        p.set("page", String(i + 2));
-        return apiFetch<PartiesResponse>(`/api/parties?${p.toString()}`);
+        p.set("page", String(page));
+        return apiFetch<PartiesResponse>(`/api/parties?${p.toString()}`).catch(() => null);
       }),
     );
 
     const allData = [...first.data, ...rest.flatMap((r) => r?.data ?? [])] as PartyWithCoalition[];
 
-    return { ...first, data: allData, total: allData.length };
+    return { ...first, data: allData };
   } catch {
     return null;
   }
